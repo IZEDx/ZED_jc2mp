@@ -30,6 +30,7 @@ MOD.Initialize = function()
 	ZED:AddCommand("model", function(ply, args)
 		if(args[2])then
 			if pcall(ply.SetModelId, ply, tonumber(args[2])) then
+				ZED:SetPData(ply, {modelId = tonumber(args[2])})
 			else
 				ply:SendChatMessage("Invalid ID.", Color(200,0,0,255))
 			end
@@ -197,6 +198,11 @@ MOD.Initialize = function()
 	ZED:AddCommand("version", function(ply, args)
 		ply:SendChatMessage("This server is runnig ZED V0.8", Color(0,150,200))
 	end)
+end
+MOD.InitPlayer = function(tbl, ply)
+	if(ZED:GetPData(ply).modelId)then
+		ply:SetModelId(ZED:GetPData(ply).modelId)
+	end
 end
 
 table.insert(ZED.Plugins, MOD)

@@ -20,9 +20,9 @@ MOD.Initialize = function()
 					return 
 				end
 			end
-			ply:SendChatMessage("Warp not found.", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Warp not found.")
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Warps:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Warps:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Warps) do
@@ -30,18 +30,18 @@ MOD.Initialize = function()
 					str = str .. ", " .. k
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3), Color(0,200,150))
 				end
 			end
 		else
-			ply:SendChatMessage("Syntax: /warp <name>", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /warp <name>")
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Warps:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Warps:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Warps) do
@@ -49,12 +49,12 @@ MOD.Initialize = function()
 					str = str .. ", " .. k
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 				end
 			end
 		end
@@ -64,12 +64,12 @@ MOD.Initialize = function()
 		if(args[2])then
 			for k,v in pairs(ZED.Warps) do
 				if(string.lower(k) == string.lower(args[2]))then
-					ply:SendChatMessage("Warp does already exist.", Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Warp does already exist.")
 					return
 				end
 			end
 			ZED.Warps[string.lower(args[2])] = ply:GetPosition()
-			ply:SendChatMessage("Warp set.", Color(0,200,0,255))
+			ZED:SendChatMessage(ply, Color(0,200,0,255),"Warp set.")
 			local tbl = {}
 			for k,v in pairs(ZED.Warps) do
 				tbl[k] = {x=v.x, y=v.y, z=v.z}
@@ -79,9 +79,9 @@ MOD.Initialize = function()
 			file:write(str)
 			file:close()
 		else
-			ply:SendChatMessage("Syntax: /warp <name>", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255,"Syntax: /warp <name>"))
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Warps:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Warps:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Warps) do
@@ -89,12 +89,12 @@ MOD.Initialize = function()
 					str = str .. ", " .. k
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 				end
 			end
 		end
@@ -105,7 +105,7 @@ MOD.Initialize = function()
 			for k,v in pairs(ZED.Warps) do
 				if(string.find(string.lower(k), string.lower(args[2])))then
 					ZED.Warps[k] = nil
-					ply:SendChatMessage("Warp deleted.", Color(0,200,0,255))
+					ZED:SendChatMessage(ply, Color(0,200,0,255),"Warp deleted.")
 					local tbl = {}
 					for k,v in pairs(ZED.Warps) do
 						tbl[k] = {x=v.x, y=v.y, z=v.z}
@@ -117,9 +117,9 @@ MOD.Initialize = function()
 					return
 				end
 			end
-			ply:SendChatMessage("Warp not found.", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Warp not found.")
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Warps:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Warps:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Warps) do
@@ -127,18 +127,18 @@ MOD.Initialize = function()
 					str = str .. ", " .. k
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 				end
 			end
 		else
-			ply:SendChatMessage("Syntax: /warp <name>", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /warp <name>")
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Warps:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Warps:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Warps) do
@@ -146,12 +146,12 @@ MOD.Initialize = function()
 					str = str .. ", " .. k
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 				end
 			end
 		end

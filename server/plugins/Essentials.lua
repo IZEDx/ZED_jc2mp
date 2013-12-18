@@ -229,6 +229,11 @@ MOD.Initialize = function()
 	ZED:AddCommand("version", function(ply, args)
 		ZED:SendChatMessage(ply, Color(0,150,200),"This server is runnig ZED V0.9", Color(0,150,200))
 	end)
+	
+	Console:Subscribe("s", function(args)
+		ZED:Broadcast(Color(200,0,0), Color(200,0,0), "Console: ", Color(255,255,255), args.text)
+	end)
+
 end
 MOD.InitPlayer = function(tbl, ply)
 	if(ZED:GetPData(ply).modelId)then

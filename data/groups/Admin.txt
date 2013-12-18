@@ -1,14 +1,1 @@
-{
-	"name":"Admin",
-	"inherits":"User",
-	"permission":[
-		"slay",
-		"removeveh",
-		"goto",
-		"bring",
-		"kick",
-		"setwarp",
-		"delwarp",
-		"ban"
-	]
-}
+{"color":[0,200,0],"name":"Admin","permission":["slay","tppos","delallveh","delveh","goto","bring","kick","setwarp","delwarp","ban"],"inherits":"User"}

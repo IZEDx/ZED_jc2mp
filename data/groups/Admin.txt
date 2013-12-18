@@ -1,0 +1,14 @@
+{
+	"name":"Admin",
+	"inherits":"User",
+	"permission":[
+		"slay",
+		"removeveh",
+		"goto",
+		"bring",
+		"kick",
+		"setwarp",
+		"delwarp",
+		"ban"
+	]
+}

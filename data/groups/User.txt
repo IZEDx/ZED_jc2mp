@@ -1,0 +1,14 @@
+{
+	"name":"User",
+	"permission":[
+		"help",
+		"who",
+		"getpos",
+		"veh",
+		"wep",
+		"model",
+		"jump",
+		"warp",
+		"info"
+	]
+}

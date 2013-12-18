@@ -27,19 +27,21 @@ function ZEDChat:Chat( args )
 end
 
 function ZEDChat:Render( args )
-	local y = Render.Height - 380
-    for i,j in ipairs(self.History) do
-		if(i > #self.History - 14)then
-			local x = 32
-			for k,v in pairs(j) do
-				Render:DrawText( Vector2(x,y) + Vector2( 1, 1 ), v.text, Color(0,0,0,150) )
-				Render:DrawText( Vector2(x,y) + Vector2( 2, 2 ), v.text, Color(0,0,0,50) )
-				Render:DrawText( Vector2(x,y), v.text, v.color )
-				x = x + Render:GetTextWidth( v.text )
+	if(Chat:GetEnabled())then
+		local y = Render.Height - 350
+		for i,j in ipairs(self.History) do
+			if(i > #self.History - 14)then
+				local x = 31
+				for k,v in pairs(j) do
+					Render:DrawText( Vector2(x,y) + Vector2( 1, 1 ), v.text, Color(0,0,0,150) )
+					Render:DrawText( Vector2(x,y) + Vector2( 2, 2 ), v.text, Color(0,0,0,50) )
+					Render:DrawText( Vector2(x,y), v.text, v.color )
+					x = x + Render:GetTextWidth( v.text )
+				end
+				y = y + Render:GetTextHeight("T")
 			end
-			y = y + Render:GetTextHeight("T") + 2
 		end
-    end
+	end
 end
 
 local zedchat = ZEDChat()

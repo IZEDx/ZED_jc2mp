@@ -388,7 +388,7 @@ MOD.InitPlayer = function(m, ply)
 	end
 end
 MOD.Chat = function(m, args)
-		ZED:Broadcast("[", ZED:ParseColor(ZED:GetPlayerGroup(args.player).color), ZED:GetPlayerGroup(args.player).name, Color(255,255,255), "] ", Color(255,255,255), args.player:GetName(), Color(150,150,150), ": ", args.text)
+		ZED:Broadcast(Color(160,160,160), "[", ZED:ParseColor(ZED:GetPlayerGroup(args.player).color), ZED:GetPlayerGroup(args.player).name, Color(160,160,160), "] ", Color(160,160,160), args.player:GetName(), Color(255,255,255), ": ", args.text)
 	return true
 end
 MOD.PlayerHasPermission = function(m, player, permission)

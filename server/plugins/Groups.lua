@@ -4,12 +4,19 @@ if( not ZED ) then ZED = {}	ZED.Plugins = {} end
 MOD = {}
 MOD.Initialize = function()
 	ZED.Groups = {}
-	ZED.CreateGroup = function(tbl, name, permission, inherits)
+	ZED.CreateGroup = function(tbl, name, permission, inherits, color)
 		grp = {}
 		grp.name = name
 		grp.permission = permission
 		grp.inherits = inherits
+		grp.color = color
 		table.insert(ZED.Groups, grp)
+	end
+	
+	ZED.ParseColor = function(tbl, t)
+		if(t)then
+			return Color(t[1],t[2],t[3])
+		end
 	end
 	ZED.GetGroup = function(tbl, g)
 		for _,grp in pairs(ZED.Groups) do
@@ -66,16 +73,16 @@ MOD.Initialize = function()
 				target = ZED:GetPlayer(args[2])
 				if(ZED:FindGroup(args[3]))then
 					ZED:SetPData(target, {group = ZED:FindGroup(args[3]).name})
-					ply:SendChatMessage("Set group from " .. target:GetName() .. " to " .. ZED:FindGroup(args[3]).name, Color(0,200,0,255))
-					target:SendChatMessage("Your group has been set to " .. ZED:FindGroup(args[3]).name, Color(0,200,0,255))
+					ZED:SendChatMessage(ply, Color(0,200,0,255),"Set group from " .. target:GetName() .. " to " .. ZED:FindGroup(args[3]).name, Color(0,200,0,255))
+					ZED:SendChatMessage(target, Color(0,200,0,255),"Your group has been set to " .. ZED:FindGroup(args[3]).name)
 				else
-					ply:SendChatMessage("Can't find group " .. args[3], Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find group " .. args[3])
 				end
 			else
-				ply:SendChatMessage("Can't find " .. args[2], Color(200,0,0,255))
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
 			end
 		else
-			ply:SendChatMessage("Syntax: /setgroup <player> <group>", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /setgroup <player> <group>", Color(200,0,0,255))
 		end
 	end)
 	
@@ -102,7 +109,7 @@ MOD.Initialize = function()
 		if(args[2] and args[3])then
 			if(ZED:strFind(args[2], "create"))then
 				if(ZED:GroupExists(args[3]))then
-					ply:SendChatMessage("Group already exists: " .. args[3], Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Group already exists: " .. args[3])
 				else
 					if(ZED:FindGroup(args[4]))then
 						ZED:CreateGroup(args[3], {}, ZED:FindGroup(args[4]).name)
@@ -113,7 +120,7 @@ MOD.Initialize = function()
 					local file = io.open("./data/groups/"..args[3]..".txt", "w")
 					file:write(str)
 					file:close()
-					ply:SendChatMessage("Group created: " .. args[3], Color(0,200,0,255))
+					ZED:SendChatMessage(ply, Color(0,200,0,255),"Group created: " .. args[3], Color(0,200,0,255))
 				end
 			elseif(ZED:strFind(args[2], "delete"))then
 				if(ZED:FindGroup(args[3]))then
@@ -124,24 +131,24 @@ MOD.Initialize = function()
 							file:write("Deleted by " .. ply:GetName())
 							file:close()
 							ZED.Groups[k] = nil
-							ply:SendChatMessage("Group deleted: " .. name, Color(0,200,0,255))
+							ZED:SendChatMessage(ply, Color(0,200,0,255),"Group deleted: " .. name)
 							break
 						end
 					end
 				else
-					ply:SendChatMessage("Can't find " .. args[3], Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[3], Color(200,0,0,255))
 				end
 			elseif(ZED:strFind(args[2], "addperm"))then
 				if(ZED:FindGroup(args[3]))then
 					if(not args[4])then
-						ply:SendChatMessage("Syntax: /group addperm <group> <permission>", Color(200,0,0,255))
+						ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group addperm <group> <permission>", Color(200,0,0,255))
 						return
 					end
 					for k,v in pairs(ZED.Groups) do
 						if(v.name == ZED:FindGroup(args[3]).name)then
 							for i,j in pairs(ZED.Groups[k].permission) do
 								if(ZED:strEquals(j, args[4]))then
-									ply:SendChatMessage("This group has already this permission: " .. args[4], Color(200,0,0,255))
+									ZED:SendChatMessage(ply, Color(200,0,0,255),"This group has already this permission: " .. args[4])
 									return
 								end
 							end
@@ -152,14 +159,14 @@ MOD.Initialize = function()
 					local file = io.open("./data/groups/"..ZED:FindGroup(args[3]).name..".txt", "w")
 					file:write(str)
 					file:close()
-					ply:SendChatMessage("Permission added: " .. args[4], Color(0,200,0,255))
+					ZED:SendChatMessage(ply, Color(0,200,0,255),"Permission added: " .. args[4])
 				else
-					ply:SendChatMessage("Can't find " .. args[3], Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[3])
 				end
 			elseif(ZED:strFind(args[2], "delperm"))then
 				if(ZED:FindGroup(args[3]))then
 					if(not args[4])then
-						ply:SendChatMessage("Syntax: /group delperm <group> <permission>", Color(200,0,0,255))
+						ZED:SendChatMessage(ply, Color(200,0,0,255), "Syntax: /group delperm <group> <permission>")
 						return
 					end
 					local found = -1
@@ -183,21 +190,41 @@ MOD.Initialize = function()
 						local file = io.open("./data/groups/"..ZED:FindGroup(args[3]).name..".txt", "w")
 						file:write(str)
 						file:close()
-						ply:SendChatMessage("Permission removed: " .. perm, Color(0,200,0,255))
+						ZED:SendChatMessage(ply, Color(0,200,0,255),"Permission removed: " .. perm)
 					else
-						ply:SendChatMessage("Permission not found: " .. args[4], Color(200,0,0,255))
+						ZED:SendChatMessage(ply, Color(200,0,0,255),"Permission not found: " .. args[4])
 					end
 				else
-					ply:SendChatMessage("Can't find " .. args[3], Color(200,0,0,255))
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[3])
+				end
+			elseif(ZED:strFind(args[2], "setcolor"))then
+				if(ZED:FindGroup(args[3]))then
+					if (not args[4]) or (not args[5]) or (not args[6]) then
+						ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: group setcolor <group> <r> <g> <b>")
+						return
+					end
+					for k,v in pairs(ZED.Groups) do
+						if(v.name == ZED:FindGroup(args[3]).name)then
+							ZED.Groups[k].color = {tonumber(args[4]), tonumber(args[5]), tonumber(args[6])}
+						end
+					end
+					local str = ZED.Modules["json"]:encode(ZED:FindGroup(args[3]))
+					local file = io.open("./data/groups/"..ZED:FindGroup(args[3]).name..".txt", "w")
+					file:write(str)
+					file:close()
+					ZED:SendChatMessage(ply, Color(tonumber(args[4]), tonumber(args[5]), tonumber(args[6])),"Color set.")
+				else
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[3])
 				end
 			end
 		else
-			ply:SendChatMessage("Syntax: /group create <name> <inherits>", Color(200,0,0,255))
-			ply:SendChatMessage("Syntax: /group delete <name>", Color(200,0,0,255))
-			ply:SendChatMessage("Syntax: /group addperm <group> <permission>", Color(200,0,0,255))
-			ply:SendChatMessage("Syntax: /group delperm <group> <permission>", Color(200,0,0,255))
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group create <name> <inherits>")
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group delete <name>")
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group addperm <group> <permission>")
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group delperm <group> <permission>")
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /group setcolor <group> <r> <g> <b>")
 			if(ZED:CountWarps() > 0)then
-				ply:SendChatMessage("Available Groups:", Color(0,180,130))
+				ZED:SendChatMessage(ply, Color(0,180,130),"Available Groups:")
 				local c = 0
 				local str = ""
 				for k,v in pairs(ZED.Groups) do
@@ -205,12 +232,12 @@ MOD.Initialize = function()
 					str = str .. ", " .. v.name
 					if (c == 5)then
 						c = 0
-						ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+						ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 						str = ""
 					end
 				end
 				if(c > 0)then
-					ply:SendChatMessage(string.sub(str, 3), Color(0,200,150))
+					ZED:SendChatMessage(ply, Color(0,200,150),string.sub(str, 3))
 				end
 			end
 		end
@@ -308,12 +335,32 @@ MOD.Initialize = function()
 				else
 					print("Can't find " .. args[2])
 				end
+			elseif(ZED:strFind(args[1], "setcolor"))then
+				if(ZED:FindGroup(args[2]))then
+					if (not args[3]) or (not args[4]) or (not args[5]) then
+						print("Syntax: group setcolor <group> <r> <g> <b>")
+						return
+					end
+					for k,v in pairs(ZED.Groups) do
+						if(v.name == ZED:FindGroup(args[2]).name)then
+							ZED.Groups[k].color = {args[3], args[4], args[5]}
+						end
+					end
+					local str = ZED.Modules["json"]:encode(ZED:FindGroup(args[2]))
+					local file = io.open("./data/groups/"..ZED:FindGroup(args[2]).name..".txt", "w")
+					file:write(str)
+					file:close()
+					print("Color set.")
+				else
+					print("Can't find " .. args[2])
+				end
 			end
 		else
 			print("Syntax: group create <name> <inherits>")
 			print("Syntax: group delete <name>")
 			print("Syntax: group addperm <group> <permission>")
 			print("Syntax: group delperm <group> <permission>")
+			print("Syntax: group setcolor <group> <r> <g> <b>")
 			if(ZED:CountWarps() > 0)then
 				print("Available Groups:")
 				local c = 0
@@ -340,8 +387,11 @@ MOD.InitPlayer = function(m, ply)
 		ZED:SetPData(ply, {group = "User"})
 	end
 end
+MOD.Chat = function(m, args)
+		ZED:Broadcast("[", ZED:ParseColor(ZED:GetPlayerGroup(args.player).color), ZED:GetPlayerGroup(args.player).name, Color(255,255,255), "] ", Color(255,255,255), args.player:GetName(), Color(150,150,150), ": ", args.text)
+	return true
+end
 MOD.PlayerHasPermission = function(m, player, permission)
-	print(ZED:GetPlayerGroup(player), permission)
 	return ZED:GroupHasPermission(ZED:GetPlayerGroup(player).name, permission)
 end
 MOD.ModsReady = function()
@@ -349,7 +399,7 @@ MOD.ModsReady = function()
 		local file = io.open("./data/groups/" .. v, "r")
 		local ret = ZED.Modules["json"]:decode(file:read("*all"))
 		if(ret)then
-			ZED:CreateGroup(string.sub(v, 1, -5), ret.permission, ret.inherits)
+			ZED:CreateGroup(string.sub(v, 1, -5), ret.permission, ret.inherits, ret.color)
 		end
 	end
 end

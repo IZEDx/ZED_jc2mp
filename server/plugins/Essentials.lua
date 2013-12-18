@@ -119,9 +119,15 @@ MOD.Initialize = function()
 	ZED:AddCommand("kick", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then
-				target = ZED:GetPlayer(args[2])
-				ZED:Broadcast("[ZED] " .. ply:GetName() .. " kicked ".. target:GetName() .. ". Reason: " .. args[3], Color(0,200,0,255))
-				target:Kick(args[3])
+				if(args[3])then
+					target = ZED:GetPlayer(args[2])
+					ZED:Broadcast("[ZED] " .. ply:GetName() .. " kicked ".. target:GetName() .. ". Reason: " .. args[3], Color(0,200,0,255))
+					target:Kick(args[3])
+				else
+					target = ZED:GetPlayer(args[2])
+					ZED:Broadcast("[ZED] " .. ply:GetName() .. " kicked ".. target:GetName() .. ".", Color(0,200,0,255))
+					target:Kick("No reason specified.")
+				end
 			else
 				ply:SendChatMessage("Can't find " .. args[2], Color(200,0,0,255))
 			end
@@ -133,9 +139,15 @@ MOD.Initialize = function()
 	ZED:AddCommand("ban", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then
-				target = ZED:GetPlayer(args[2])
-				ZED:Broadcast("[ZED] " .. ply:GetName() .. " banned ".. target:GetName() .. ". Reason: " .. args[3], Color(0,200,0,255))
-				target:Ban(args[3])
+				if(args[3])then
+					target = ZED:GetPlayer(args[2])
+					ZED:Broadcast("[ZED] " .. ply:GetName() .. " banned ".. target:GetName() .. ". Reason: " .. args[3], Color(0,200,0,255))
+					target:Ban(args[3])
+				else
+					target = ZED:GetPlayer(args[2])
+					ZED:Broadcast("[ZED] " .. ply:GetName() .. " banned ".. target:GetName() .. "." , Color(0,200,0,255))
+					target:Ban("No reason specified.")
+				end
 			else
 				ply:SendChatMessage("Can't find " .. args[2], Color(200,0,0,255))
 			end

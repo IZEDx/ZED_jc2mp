@@ -90,10 +90,11 @@ ZED.RemoveCommand = function(tbl, str)
 	ZED.Commands[string.lower(str)] = nil
 end
 
-ZED.Broadcast = function(tbl, str, clr)
-	for ply in Server:GetPlayers() do
-		ply:SendChatMessage(tostring(str), clr)
-	end
+ZED.SendChatMessage = function(tbl, ply, ...)
+	Network:Send( ply, "ZEDChat", {...} )
+end
+ZED.Broadcast = function(tbl, ...)
+	Network:Broadcast( "ZEDChat", {...} )
 end
 ZED.GetPlayer = function(tbl, str)
 	for player in Server:GetPlayers() do
@@ -103,32 +104,43 @@ ZED.GetPlayer = function(tbl, str)
 	end
 end
 
+
+
 Events:Subscribe("PlayerChat", function(args)
 	if (args.text:sub(1, 1) ~= '/') then
-		return true
+		t = {}
+		for _,MOD in pairs(ZED.Plugins) do
+			if(MOD.Chat)then
+				if MOD:Chat(args) then
+					return false
+				end
+			end
+		end
+		ZED:Broadcast(Color(255,255,255), args.player:GetName(), Color(150,150,150), ": ", args.text)
+		return false
 	end
 	local str = string.sub(args.text, 2)
 	local cmd = str:split(' ')
 	if( ZED.Commands[string.lower(cmd[1])] )then
 		if( not ZED:PlayerHasPermission(args.player, string.lower(cmd[1])))then
-			args.player:SendChatMessage("You have no access to this command: " .. string.lower(cmd[1]), Color(200,0,0,255))
+			ZED:SendChatMessage(args.player, Color(200,0,0,255), "You have no access to this command: " .. string.lower(cmd[1]), Color(200,0,0,255))
 			print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
 			return false
 		end
 		ZED.Commands[string.lower(cmd[1])](args.player, cmd)
 		print(args.player:GetName() .. " used command: " .. string.lower(args.text))
 	else
-		args.player:SendChatMessage("Command not found: " .. string.lower(cmd[1]), Color(200,0,0,255))
+		ZED:SendChatMessage(args.player, Color(200,0,0,255), "Command not found: " .. string.lower(cmd[1]), Color(200,0,0,255))
 		print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
 	end
 	return false
 end)
 Events:Subscribe("PlayerJoin", function(args)
-	ZED:Broadcast(args.player:GetName().." joined the server.", Color(0,200,200,255))
+	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." joined the server.")
 	ZED:InitPlayer(args.player)
 end)
 Events:Subscribe("PlayerQuit", function(args)
-	ZED:Broadcast(args.player:GetName().." left the server.", Color(0,200,200,255))
+	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
 end)
 Events:Subscribe("ModulesLoad", function(args)
 	for _,MOD in pairs(ZED.Plugins) do

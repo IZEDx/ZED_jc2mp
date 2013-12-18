@@ -1,1 +1,1 @@
-{"name":"Owner","inherits":"Admin","permission":["*"]}
+{"color":[200,0,0],"name":"Owner","permission":["*"],"inherits":"Admin"}

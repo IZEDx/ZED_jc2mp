@@ -27,7 +27,6 @@ function ZEDChat:Chat( args )
 end
 
 function ZEDChat:Render( args )
-    if Game:GetState() ~= GUIState.Game then return end
 	local y = Render.Height - 380
     for i,j in ipairs(self.History) do
 		if(i > #self.History - 14)then

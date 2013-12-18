@@ -102,6 +102,20 @@ MOD.Initialize = function()
 		end
 	end)
 	
+	ZED:AddCommand("tppos", function(ply, args)
+		if (not args[2]) or (not args[4]) or (not args[3]) then
+			ply:SendChatMessage("Syntax: /tppos <x> <y> <z>", Color(200,0,0,255))
+			return
+		end
+		pos = Vector3(tonumber(args[2]), tonumber(args[3]), tonumber(args[4]))
+		if(pos)then
+			ply:SetPosition(pos)
+			ply:SendChatMessage("You teleported to " .. args[2] .. ", " .. args[3] .. ", " .. args[4], Color(0,200,0,255))
+		else
+			ply:SendChatMessage("Syntax: /tppos <x> <y> <z>", Color(200,0,0,255))
+		end
+	end)
+
 	ZED:AddCommand("bring", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then

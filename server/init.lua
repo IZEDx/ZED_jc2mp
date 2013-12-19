@@ -140,7 +140,7 @@ Events:Subscribe("PlayerDeath", function(args)
 end)
 Events:Subscribe("PlayerChat", function(args)
 	if (args.text:sub(1, 1) ~= '/') then
-		t = {}
+		Console:Print(args.player:GetName() .. ": " .. args.text)
 		for _,MOD in pairs(ZED.Plugins) do
 			if(MOD.ChatIII)then
 				if MOD:ChatIII(args) then

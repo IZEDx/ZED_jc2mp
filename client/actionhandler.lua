@@ -7,7 +7,7 @@ function ZEDActionHandler:__init()
     Events:Subscribe( "LocalPlayerInput", self, self.LocalPlayerInput )
 end
 
-function ZEDActionHandler:DisableAction( args )
+function ZEDActionHandler:EnableAction( args )
 	for k,v in pairs(self.blacklist) do
 		if v == args.action then
 			self.blacklist[k] = nil
@@ -15,7 +15,7 @@ function ZEDActionHandler:DisableAction( args )
 	end
 end
 
-function ZEDActionHandler:EnableAction( args )
+function ZEDActionHandler:DisableAction( args )
 	for k,v in pairs(self.blacklist) do
 		if v == args.action then
 			return

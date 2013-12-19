@@ -96,6 +96,18 @@ end
 ZED.Broadcast = function(tbl, ...)
 	Network:Broadcast( "ZEDChat", {...} )
 end
+ZED.UpdatePlayerList = function(tbl)
+	local t = {}
+	t.players = {}
+	t.name = Config:GetValue("Server", "Name")
+	--print(t.name)
+	--for i = 1, 100, 1 do
+	for v in Server:GetPlayers() do
+			table.insert(t.players, {name=v:GetName(),color=v:GetColor()})
+	end
+	--end
+	Network:Broadcast( "ZEDUpdateBoard", t )
+end
 ZED.GetPlayer = function(tbl, str)
 	for player in Server:GetPlayers() do
 		if(string.find(string.lower(player:GetName()), string.lower(str)))then
@@ -142,6 +154,9 @@ end)
 Events:Subscribe("PlayerQuit", function(args)
 	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
 end)
+Events:Subscribe("PostTick", function()
+	ZED:UpdatePlayerList()
+end)
 Events:Subscribe("ModulesLoad", function(args)
 	for _,MOD in pairs(ZED.Plugins) do
 		if(MOD.name)then
@@ -159,4 +174,5 @@ Events:Subscribe("ModulesLoad", function(args)
 	for ply in Server:GetPlayers() do
 		ZED:InitPlayer(ply)
 	end
+	ZED:UpdatePlayerList()
 end)

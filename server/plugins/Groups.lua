@@ -44,9 +44,12 @@ MOD.Initialize = function()
 		end
 	end
 	ZED.GetPlayerGroup = function(tbl, ply)
-		for _,grp in pairs(ZED.Groups) do
-			if(ZED:strEquals(grp.name, ZED:GetPData(ply).group))then
-				return grp
+		local pdata = ZED:GetPData(ply)
+		if(pdata)then
+			for _,grp in pairs(ZED.Groups) do
+				if(ZED:strEquals(grp.name, pdata.group))then
+					return grp
+				end
 			end
 		end
 	end

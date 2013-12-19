@@ -3,6 +3,8 @@ if( not ZED ) then ZED = {}	ZED.Plugins = {} end
 
 MOD = {}
 MOD.Initialize = function()
+	local FreezeActions = {39, 152, 48, 47, 67, 66, 68, 69, 36, 118, 146, 76, 19, 37, 116, 113, 115, 114, 117, 45, 46, 11, 81, 12, 13, 14, 82, 43, 57, 132, 50, 56, 49, 55, 53, 54, 51, 52, 78, 35, 4, 5, 6, 3, 1, 137, 31, 30, 32, 33, 70, 17, 72, 71, 147, 148, 65, 64, 59, 62, 63, 60, 61, 18, 144, 145, 16, 7, 40, 9, 126, 125, 128, 127, 44, 119, 75, 73, 74, 77, 10, 15, 41, 42, 38, 8, 138, 139, 34, 29, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 83, 84 }
+
 	ZED:AddCommand("veh", function(ply, args)
 		if(args[2])then
 			status, veh = pcall(Vehicle.Create, tonumber(args[2]), ply:GetPosition(), ply:GetAngle())
@@ -175,6 +177,38 @@ MOD.Initialize = function()
 			end
 		else
 			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /enact <name> <id>", Color(200,0,0,255))
+		end
+	end)
+
+	ZED:AddCommand("freeze", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				target = ZED:GetPlayer(args[2])
+				for k,v in pairs(FreezeActions) do
+					Network:Send(target, "ZEDDisableAction", {action=v})
+				end
+				ZED:SendChatMessage(ply, Color(200,0,0,255),ply:GetName() .. " froze you.", Color(200,0,0,255))
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /freeze <name>", Color(200,0,0,255))
+		end
+		
+	end)
+	ZED:AddCommand("unfreeze", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				target = ZED:GetPlayer(args[2])
+				for k,v in pairs(FreezeActions) do
+					Network:Send(target, "ZEDEnableAction", {action=v})
+				end
+				ZED:SendChatMessage(ply, Color(0,200,0,255),ply:GetName() .. " unfrozed you.", Color(200,0,0,255))
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /unfreeze <name>", Color(200,0,0,255))
 		end
 	end)
 	

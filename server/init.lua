@@ -4,6 +4,15 @@ if not ZED.Plugins then ZED.Plugins = {} end
 ZED.Modules = {}
 ZED.Player = {} 
 
+
+--[[    ADD YOUR EXTERNAL COMMANDS HERE!!    ]]
+ZED.CommandWhitelist = {
+	derby=true, 
+	tp=true
+}
+
+--[[ DO NOT EDIT AFTER THIS POINT ]]
+
 ZED.file_exists =  function (tbl, name)
    local f=io.open(name,"r")
    if f~=nil then io.close(f) return true else return false end
@@ -113,11 +122,18 @@ ZED.UpdatePlayerList = function(tbl)
 	local t = {}
 	t.players = {}
 	t.name = Config:GetValue("Server", "Name")
-	--print(t.name)
-	--for i = 1, 100, 1 do
+
 	for v in Server:GetPlayers() do
-		if(ZED.GetPlayerGroup)then
-			table.insert(t.players, {name=v:GetName(),color=ZED:ParseColor(ZED:GetPlayerGroup(v).color),group=ZED:GetPlayerGroup(v).name,kills=ZED:GetPData(v).kills,deaths=ZED:GetPData(v).deaths,ping=v:GetPing()})
+		if(ZED:PDataExists(v))then -- I think I just found the bug lols
+			if(not ZED:GetPData(v).deaths)then
+				ZED:SetPData(v, {deaths=0})
+			end
+			if(not ZED:GetPData(v).kills)then
+				ZED:SetPData(v, {kills=0})
+			end
+			if(ZED.GetPlayerGroup)then
+				table.insert(t.players, {name=v:GetName(),color=ZED:ParseColor(ZED:GetPlayerGroup(v).color),group=ZED:GetPlayerGroup(v).name,kills=ZED:GetPData(v).kills,deaths=ZED:GetPData(v).deaths,ping=v:GetPing()})
+			end
 		end
 	end
 	--end
@@ -192,6 +208,8 @@ Events:Subscribe("PlayerChat", function(args)
 		end
 		ZED.Commands[string.lower(cmd[1])](args.player, cmd)
 		print(args.player:GetName() .. " used command: " .. string.lower(args.text))
+	elseif( ZED.CommandWhitelist[string.lower(cmd[1])])then
+		print(args.player:GetName() .. " used whitelisted external command: " .. string.lower(args.text))
 	else
 		ZED:SendChatMessage(args.player, Color(200,0,0,255), "Command not found: " .. string.lower(cmd[1]), Color(200,0,0,255))
 		print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
@@ -233,4 +251,16 @@ Events:Subscribe("ModulesLoad", function(args)
 		end
 	end)
 	ZED:UpdatePlayerList()
+end)
+
+
+
+Events:Register( "ZEDChatPrint" )
+Events:Subscribe( "ZEDChatPrint" , function ( args )
+	if(args.type == "Broadcast")then
+		ZED:Broadcast(args.color, args.text)
+	end
+	if(args.type == "Send")then
+		ZED:SendChatMessage(args.player, args.color, args.text)
+	end
 end)

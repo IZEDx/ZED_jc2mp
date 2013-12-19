@@ -1,12 +1,13 @@
 class 'ZEDChat'
 
 function ZEDChat:__init()
+	Events:Register("ZEDTunnel")
 	self.History = {}
 	self.ChatEnabled = true
     Network:Subscribe( "ZEDChat", self, self.Chat )
     Events:Subscribe( "Render", self, self.Render )
     Events:Subscribe( "KeyDown", self, self.KeyDown )
-	
+    Events:Subscribe( "ZEDTunnel", self, self.Chat )
 end
 
 function ZEDChat:ParseMessage(args)
@@ -21,6 +22,7 @@ function ZEDChat:ParseMessage(args)
 	end
 	table.insert(self.History, t)
 end
+
 
 function ZEDChat:Chat( args )
 	for i = 0, 14, 1 do

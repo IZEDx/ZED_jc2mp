@@ -23,8 +23,8 @@ function ZEDBoard:Render( args )
 	if(Key:IsDown(9))then
 		local y = 30
 		Render:FillArea(Vector2(Render.Width/5-20,y), Vector2(Render.Width /5*3+40, 80 + (Render.Height - 200)), Color(0,0,0,150))
-		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth(self.ServerName)/2,y+10), self.ServerName, Color(255,255,255), 20 )
-		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players)/2,y+30), "Players: " .. #self.Players, Color(255,255,255), 18 )
+		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth(self.ServerName, 20)/2,y+10), self.ServerName, Color(255,255,255), 20 )
+		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players, 18)/2,y+30), "Players: " .. #self.Players, Color(255,255,255), 18 )
 		
 		y = y + 50
 		local x = Render.Width / 5

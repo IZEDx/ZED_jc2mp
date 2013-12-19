@@ -93,7 +93,7 @@ MOD.Initialize = function()
 				if(ZED:FindGroup(args[2]))then
 					ZED:SetPData(target, {group = ZED:FindGroup(args[2]).name})
 					print("Set group from " .. target:GetName() .. " to " .. ZED:FindGroup(args[2]).name)
-					target:SendChatMessage("Your group has been set to " .. ZED:FindGroup(args[2]).name, Color(0,200,0,255))
+					ZED:SendChatMessage(target, Color(0,200,0), "Your group has been set to " .. ZED:FindGroup(args[2]).name, Color(0,200,0,255))
 				else
 					print("Can't find group " .. args[2])
 				end

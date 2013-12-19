@@ -42,8 +42,10 @@ end
 
 ZED.GetPData = function(t, ply)
 	local file = io.open("./data/player/" .. string.gsub(tostring(ply:GetSteamId()), ":", "-") .. ".txt", "r")
-	local ret = ZED.Modules["json"]:decode(file:read("*all"))
-	return ret
+	if(file)then
+		local ret = ZED.Modules["json"]:decode(file:read("*all"))
+		return ret
+	end
 end
 ZED.SetPData = function(t, ply, tbl)
 	local str = ZED.Modules["json"]:encode(tbl)
@@ -69,12 +71,21 @@ ZED.InitPlayer = function(tbl, ply)
 	if(not ZED:PDataExists(ply))then
 		local tbl = {}
 		tbl.permission = {}
+		tbl.kills = 0
+		tbl.deaths = 0
 		ZED:SetPData(ply, tbl)
 	end
 	for _,MOD in pairs(ZED.Plugins) do
 		if(MOD.InitPlayer)then
 			MOD:InitPlayer(ply)
 		end
+	end
+	
+	if(ZED:GetPData(ply).kills)then
+		ZED:SetPData(ply, {kills=0})
+	end
+	if(ZED:GetPData(ply).deaths)then
+		ZED:SetPData(ply, {deaths=0})
 	end
 end
 
@@ -96,6 +107,7 @@ end
 ZED.Broadcast = function(tbl, ...)
 	Network:Broadcast( "ZEDChat", {...} )
 end
+
 ZED.UpdatePlayerList = function(tbl)
 	local t = {}
 	t.players = {}
@@ -103,7 +115,7 @@ ZED.UpdatePlayerList = function(tbl)
 	--print(t.name)
 	--for i = 1, 100, 1 do
 	for v in Server:GetPlayers() do
-			table.insert(t.players, {name=v:GetName(),color=v:GetColor()})
+		table.insert(t.players, {name=v:GetName(),color=ZED:ParseColor(ZED:GetPlayerGroup(v).color),group=ZED:GetPlayerGroup(v).name,kills=ZED:GetPData(v).kills,deaths=ZED:GetPData(v).deaths,ping=v:GetPing()})
 	end
 	--end
 	Network:Broadcast( "ZEDUpdateBoard", t )
@@ -117,7 +129,16 @@ ZED.GetPlayer = function(tbl, str)
 end
 
 
-
+ 
+local timer = 0
+Events:Subscribe("PlayerDeath", function(args)
+	if args.killer then
+		ZED:SetPData(args.killer, {kills=ZED:GetPData(args.player).kills+1})
+		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+	else
+		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+	end
+end)
 Events:Subscribe("PlayerChat", function(args)
 	if (args.text:sub(1, 1) ~= '/') then
 		t = {}
@@ -148,14 +169,20 @@ Events:Subscribe("PlayerChat", function(args)
 	return false
 end)
 Events:Subscribe("PlayerJoin", function(args)
+
 	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." joined the server.")
 	ZED:InitPlayer(args.player)
 end)
 Events:Subscribe("PlayerQuit", function(args)
 	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
+	ZED:UpdatePlayerList()
 end)
 Events:Subscribe("PostTick", function()
-	ZED:UpdatePlayerList()
+	timer = timer + 1
+	if(timer > 500)then
+		ZED:UpdatePlayerList()
+		timer = 0
+	end
 end)
 Events:Subscribe("ModulesLoad", function(args)
 	for _,MOD in pairs(ZED.Plugins) do

@@ -144,6 +144,40 @@ MOD.Initialize = function()
 		end
 	end)
 	
+	ZED:AddCommand("disact", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				if(args[3])then
+					target = ZED:GetPlayer(args[2])
+					Network:Send(target, "ZEDDisableAction", {action=tonumber(args[3])})
+				else
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Please specify an action", Color(200,0,0,255))
+				end
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /disact <name> <id>", Color(200,0,0,255))
+		end
+	end)
+	
+	ZED:AddCommand("enact", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				if(args[3])then
+					target = ZED:GetPlayer(args[2])
+					Network:Send(target, "ZEDEnableAction", {action=tonumber(args[3])})
+				else
+					ZED:SendChatMessage(ply, Color(200,0,0,255),"Please specify an action", Color(200,0,0,255))
+				end
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /enact <name> <id>", Color(200,0,0,255))
+		end
+	end)
+	
 	ZED:AddCommand("kick", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then
@@ -227,7 +261,7 @@ MOD.Initialize = function()
 	end)
 	
 	ZED:AddCommand("version", function(ply, args)
-		ZED:SendChatMessage(ply, Color(0,150,200),"This server is runnig ZED V0.9", Color(0,150,200))
+		ZED:SendChatMessage(ply, Color(0,150,200),"This server is runnig ZED V1.0", Color(0,150,200))
 	end)
 	
 	Console:Subscribe("s", function(args)

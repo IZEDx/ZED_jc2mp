@@ -4,7 +4,8 @@ if( not ZED ) then ZED = {}	ZED.Plugins = {} end
 MOD = {}
 MOD.Initialize = function()
 	local FreezeActions = {39, 152, 48, 47, 67, 66, 68, 69, 36, 118, 146, 76, 19, 37, 116, 113, 115, 114, 117, 45, 46, 11, 81, 12, 13, 14, 82, 43, 57, 132, 50, 56, 49, 55, 53, 54, 51, 52, 78, 35, 4, 5, 6, 3, 1, 137, 31, 30, 32, 33, 70, 17, 72, 71, 147, 148, 65, 64, 59, 62, 63, 60, 61, 18, 144, 145, 16, 7, 40, 9, 126, 125, 128, 127, 44, 119, 75, 73, 74, 77, 10, 15, 41, 42, 38, 8, 138, 139, 34, 29, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 83, 84 }
-
+	MOD.MutedPlayers = {}
+	
 	ZED:AddCommand("veh", function(ply, args)
 		if(args[2])then
 			status, veh = pcall(Vehicle.Create, tonumber(args[2]), ply:GetPosition(), ply:GetAngle())
@@ -180,6 +181,50 @@ MOD.Initialize = function()
 		end
 	end)
 
+	ZED:AddCommand("mute", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				target = ZED:GetPlayer(args[2])
+				for k,v in pairs(MOD.MutedPlayers) do
+					if k == tostring(target:GetSteamId()) then
+						ZED:SendChatMessage(ply, Color(200,0,0,255),"This player is already muted.", Color(200,0,0,255))
+						return
+					end
+				end
+				MOD.MutedPlayers[tostring(target:GetSteamId())]=true
+				ZED:SendChatMessage(target, Color(200,0,0,255),ply:GetName() .. " muted you.", Color(200,0,0,255))
+						ZED:SendChatMessage(ply, Color(0,200,0,255),"You muted ", target:GetName(), Color(200,0,0,255))
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /mute <name>", Color(200,0,0,255))
+		end
+		
+	end)
+	
+	ZED:AddCommand("unmute", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				target = ZED:GetPlayer(args[2])
+				for k,v in pairs(MOD.MutedPlayers) do
+					if k == tostring(target:GetSteamId()) then
+						MOD.MutedPlayers[k] = nil
+						ZED:SendChatMessage(target, Color(0,200,0,255),ply:GetName() .. " unmuted you.", Color(200,0,0,255))
+						ZED:SendChatMessage(ply, Color(0,200,0,255),"You unmuted ", target:GetName(), Color(200,0,0,255))
+						return
+					end
+				end
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"This player is not muted.", Color(200,0,0,255))
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /unmute <name>", Color(200,0,0,255))
+		end
+		
+	end)
+	
 	ZED:AddCommand("freeze", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then
@@ -188,6 +233,7 @@ MOD.Initialize = function()
 					Network:Send(target, "ZEDDisableAction", {action=v})
 				end
 				ZED:SendChatMessage(target, Color(200,0,0,255),ply:GetName() .. " froze you.", Color(200,0,0,255))
+				ZED:SendChatMessage(ply, Color(0,200,0,255),"You froze ", target:GetName(), Color(200,0,0,255))
 			else
 				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
 			end
@@ -205,6 +251,7 @@ MOD.Initialize = function()
 					Network:Send(target, "ZEDEnableAction", {action=v})
 				end
 				ZED:SendChatMessage(target, Color(0,200,0,255),ply:GetName() .. " unfrozed you.", Color(200,0,0,255))
+				ZED:SendChatMessage(ply, Color(0,200,0,255),"You unfroze ", target:GetName(), Color(200,0,0,255))
 			else
 				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
 			end
@@ -318,6 +365,11 @@ MOD.Initialize = function()
 		ZED:Broadcast(Color(200,0,0), Color(200,0,0), "Console: ", Color(255,255,255), args.text)
 	end)
 
+end
+MOD.ChatIII = function(m, args)
+	if(MOD.MutedPlayers[tostring(args.player:GetSteamId())])then
+		return true
+	end
 end
 MOD.InitPlayer = function(tbl, ply)
 	if(ZED:GetPData(ply).modelId)then

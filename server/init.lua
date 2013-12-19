@@ -68,6 +68,12 @@ ZED.PDataExists = function(t, ply)
 	end
 end
 ZED.InitPlayer = function(tbl, ply)
+	if(not ZED:GetPData(ply).deaths)then
+		ZED:SetPData(ply, {deaths=0})
+	end
+	if(not ZED:GetPData(ply).kills)then
+		ZED:SetPData(ply, {kills=0})
+	end
 	if(not ZED:PDataExists(ply))then
 		local tbl = {}
 		tbl.permission = {}
@@ -79,13 +85,6 @@ ZED.InitPlayer = function(tbl, ply)
 		if(MOD.InitPlayer)then
 			MOD:InitPlayer(ply)
 		end
-	end
-	
-	if(ZED:GetPData(ply).kills)then
-		ZED:SetPData(ply, {kills=0})
-	end
-	if(ZED:GetPData(ply).deaths)then
-		ZED:SetPData(ply, {deaths=0})
 	end
 end
 
@@ -133,7 +132,7 @@ end
 local timer = 0
 Events:Subscribe("PlayerDeath", function(args)
 	if args.killer then
-		ZED:SetPData(args.killer, {kills=ZED:GetPData(args.player).kills+1})
+		ZED:SetPData(args.killer, {kills=ZED:GetPData(args.killer).kills+1})
 		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
 	else
 		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
@@ -142,6 +141,27 @@ end)
 Events:Subscribe("PlayerChat", function(args)
 	if (args.text:sub(1, 1) ~= '/') then
 		t = {}
+		for _,MOD in pairs(ZED.Plugins) do
+			if(MOD.ChatIII)then
+				if MOD:ChatIII(args) then
+					return false
+				end
+			end
+		end
+		for _,MOD in pairs(ZED.Plugins) do
+			if(MOD.ChatII)then
+				if MOD:ChatII(args) then
+					return false
+				end
+			end
+		end
+		for _,MOD in pairs(ZED.Plugins) do
+			if(MOD.ChatI)then
+				if MOD:ChatI(args) then
+					return false
+				end
+			end
+		end
 		for _,MOD in pairs(ZED.Plugins) do
 			if(MOD.Chat)then
 				if MOD:Chat(args) then
@@ -177,13 +197,7 @@ Events:Subscribe("PlayerQuit", function(args)
 	ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
 	ZED:UpdatePlayerList()
 end)
-Events:Subscribe("PostTick", function()
-	timer = timer + 1
-	if(timer > 500)then
-		ZED:UpdatePlayerList()
-		timer = 0
-	end
-end)
+
 Events:Subscribe("ModulesLoad", function(args)
 	for _,MOD in pairs(ZED.Plugins) do
 		if(MOD.name)then
@@ -201,5 +215,12 @@ Events:Subscribe("ModulesLoad", function(args)
 	for ply in Server:GetPlayers() do
 		ZED:InitPlayer(ply)
 	end
+	Events:Subscribe("PostTick", function()
+		timer = timer + 1
+		if(timer > 200)then
+			ZED:UpdatePlayerList()
+			timer = 0
+		end
+	end)
 	ZED:UpdatePlayerList()
 end)

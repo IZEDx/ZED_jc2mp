@@ -187,7 +187,7 @@ MOD.Initialize = function()
 				for k,v in pairs(FreezeActions) do
 					Network:Send(target, "ZEDDisableAction", {action=v})
 				end
-				ZED:SendChatMessage(ply, Color(200,0,0,255),ply:GetName() .. " froze you.", Color(200,0,0,255))
+				ZED:SendChatMessage(target, Color(200,0,0,255),ply:GetName() .. " froze you.", Color(200,0,0,255))
 			else
 				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
 			end
@@ -204,7 +204,7 @@ MOD.Initialize = function()
 				for k,v in pairs(FreezeActions) do
 					Network:Send(target, "ZEDEnableAction", {action=v})
 				end
-				ZED:SendChatMessage(ply, Color(0,200,0,255),ply:GetName() .. " unfrozed you.", Color(200,0,0,255))
+				ZED:SendChatMessage(target, Color(0,200,0,255),ply:GetName() .. " unfrozed you.", Color(200,0,0,255))
 			else
 				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
 			end

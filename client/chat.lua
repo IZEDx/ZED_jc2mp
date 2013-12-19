@@ -2,8 +2,10 @@ class 'ZEDChat'
 
 function ZEDChat:__init()
 	self.History = {}
+	self.ChatEnabled = true
     Network:Subscribe( "ZEDChat", self, self.Chat )
     Events:Subscribe( "Render", self, self.Render )
+    Events:Subscribe( "KeyDown", self, self.KeyDown )
 end
 
 function ZEDChat:ParseMessage(args)
@@ -27,7 +29,7 @@ function ZEDChat:Chat( args )
 end
 
 function ZEDChat:Render( args )
-	if(Chat:GetEnabled())then
+	if(self.ChatEnabled)then
 		local y = Render.Height - 350
 		local bigwidth = 0
 		for i,j in ipairs(self.History) do
@@ -55,6 +57,15 @@ function ZEDChat:Render( args )
 				end
 				y = y + Render:GetTextHeight("T")
 			end
+		end
+	end
+end
+function ZEDChat:KeyDown( args )
+	if(args.key == 114)then
+		if(self.ChatEnabled)then
+			self.ChatEnabled = false
+		else
+			self.ChatEnabled = true
 		end
 	end
 end

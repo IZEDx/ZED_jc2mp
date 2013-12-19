@@ -6,6 +6,7 @@ function ZEDChat:__init()
     Network:Subscribe( "ZEDChat", self, self.Chat )
     Events:Subscribe( "Render", self, self.Render )
     Events:Subscribe( "KeyDown", self, self.KeyDown )
+	
 end
 
 function ZEDChat:ParseMessage(args)

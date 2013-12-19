@@ -337,6 +337,10 @@ MOD.Initialize = function()
 		end
 	end)
 	
+	ZED:AddCommand("test", function(ply, args)
+		ply:SendChatMessage("TEEEEST", Color(0,0,0))
+	end)
+	
 	ZED:AddCommand("help", function(ply, args)
 		ZED:SendChatMessage(ply, Color(0,150,200),"========== Commands =======")
 		local c = 0

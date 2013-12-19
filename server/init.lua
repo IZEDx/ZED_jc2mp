@@ -2,7 +2,7 @@ if not ZED then ZED = {} end
 ZED.Commands = {}
 if not ZED.Plugins then ZED.Plugins = {} end
 ZED.Modules = {}
-ZED.Player = {}
+ZED.Player = {} 
 
 ZED.file_exists =  function (tbl, name)
    local f=io.open(name,"r")
@@ -68,11 +68,13 @@ ZED.PDataExists = function(t, ply)
 	end
 end
 ZED.InitPlayer = function(tbl, ply)
-	if(not ZED:GetPData(ply).deaths)then
-		ZED:SetPData(ply, {deaths=0})
-	end
-	if(not ZED:GetPData(ply).kills)then
-		ZED:SetPData(ply, {kills=0})
+	if(ZED:PDataExists(ply))then -- I think I just found the bug lols
+		if(not ZED:GetPData(ply).deaths)then
+			ZED:SetPData(ply, {deaths=0})
+		end
+		if(not ZED:GetPData(ply).kills)then
+			ZED:SetPData(ply, {kills=0})
+		end
 	end
 	if(not ZED:PDataExists(ply))then
 		local tbl = {}
@@ -114,7 +116,9 @@ ZED.UpdatePlayerList = function(tbl)
 	--print(t.name)
 	--for i = 1, 100, 1 do
 	for v in Server:GetPlayers() do
-		table.insert(t.players, {name=v:GetName(),color=ZED:ParseColor(ZED:GetPlayerGroup(v).color),group=ZED:GetPlayerGroup(v).name,kills=ZED:GetPData(v).kills,deaths=ZED:GetPData(v).deaths,ping=v:GetPing()})
+		if(ZED.GetPlayerGroup)then
+			table.insert(t.players, {name=v:GetName(),color=ZED:ParseColor(ZED:GetPlayerGroup(v).color),group=ZED:GetPlayerGroup(v).name,kills=ZED:GetPData(v).kills,deaths=ZED:GetPData(v).deaths,ping=v:GetPing()})
+		end
 	end
 	--end
 	Network:Broadcast( "ZEDUpdateBoard", t )
@@ -132,10 +136,16 @@ end
 local timer = 0
 Events:Subscribe("PlayerDeath", function(args)
 	if args.killer then
-		ZED:SetPData(args.killer, {kills=ZED:GetPData(args.killer).kills+1})
-		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+		if(ZED:GetPData(args.killer))then
+			ZED:SetPData(args.killer, {kills=ZED:GetPData(args.killer).kills+1})
+		end
+		if(ZED:GetPData(args.player))then
+			ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+		end
 	else
-		ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+		if(ZED:GetPData(args.player))then
+			ZED:SetPData(args.player, {deaths=ZED:GetPData(args.player).deaths+1})
+		end
 	end
 end)
 Events:Subscribe("PlayerChat", function(args)

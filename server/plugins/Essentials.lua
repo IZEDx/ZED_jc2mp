@@ -196,6 +196,7 @@ MOD.Initialize = function()
 		end
 		
 	end)
+
 	ZED:AddCommand("unfreeze", function(ply, args)
 		if(args[2])then
 			if ZED:GetPlayer(args[2]) then
@@ -210,6 +211,21 @@ MOD.Initialize = function()
 		else
 			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /unfreeze <name>", Color(200,0,0,255))
 		end
+	end)
+	
+	ZED:AddCommand("disarm", function(ply, args)
+		if(args[2])then
+			if ZED:GetPlayer(args[2]) then
+				target = ZED:GetPlayer(args[2])
+				target:ClearInventory()
+				ZED:SendChatMessage(ply, Color(200,0,0,255),ply:GetName() .. " disarmed you.", Color(200,0,0,255))
+			else
+				ZED:SendChatMessage(ply, Color(200,0,0,255),"Can't find " .. args[2], Color(200,0,0,255))
+			end
+		else
+			ZED:SendChatMessage(ply, Color(200,0,0,255),"Syntax: /freeze <name>", Color(200,0,0,255))
+		end
+		
 	end)
 	
 	ZED:AddCommand("kick", function(ply, args)

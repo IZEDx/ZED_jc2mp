@@ -21,16 +21,38 @@ end
 
 function ZEDBoard:Render( args )
 	if(Key:IsDown(9))then
-		local y = 40
+		local y = 30
 		Render:FillArea(Vector2(Render.Width/5-20,y), Vector2(Render.Width /5*3+40, 80 + (Render.Height - 200)), Color(0,0,0,150))
 		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth(self.ServerName)/2,y+10), self.ServerName, Color(255,255,255), 20 )
-		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players)/2,y+30), "Players: " .. #self.Players, Color(255,255,255), 20 )
-		y = y + 60
+		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players)/2,y+30), "Players: " .. #self.Players, Color(255,255,255), 18 )
+		
+		y = y + 50
+		local x = Render.Width / 5
+		Render:DrawText( Vector2(x+35,y+2), "Name", Color(200,200,200),13 )
+		x = x + Render.Width / 7
+		Render:DrawText( Vector2(x,y+2), "Group", Color(200,200,200),13 )
+		x = x + Render.Width / 7
+		Render:DrawText( Vector2(x,y+2), "Kills", Color(200,200,200),13 )
+		x = x + Render.Width / 7
+		Render:DrawText( Vector2(x,y+2), "Deaths", Color(200,200,200),13 )
+		x = x + Render.Width / 7
+		Render:DrawText( Vector2(x,y+2), "Ping", Color(200,200,200),13 )
+		
+		y = y + 20
 		for i = math.floor(self.ScrollPosition) + 1,math.floor(self.ScrollPosition) + 1+self.PossibleItems,1 do
 			if(self.Players[i])then
-				local x = Render.Width /5
+				x = Render.Width / 5
 				Render:FillArea(Vector2(x,y), Vector2(Render.Width /5*3, Render:GetTextHeight("T") + 2), self.Players[i].color)
-				Render:DrawText( Vector2(x+1,y+2), i .. ": " .. self.Players[i].name, Color(0,0,0) )
+				Render:DrawText( Vector2(x+1,y+2), i .. "", Color(50,50,50) )
+				Render:DrawText( Vector2(x+35,y+2), self.Players[i].name, Color(0,0,0) )
+				x = x + Render.Width / 7
+				Render:DrawText( Vector2(x,y+2), self.Players[i].group, Color(0,0,0) )
+				x = x + Render.Width / 7
+				Render:DrawText( Vector2(x,y+2), tostring(self.Players[i].kills), Color(0,0,0) )
+				x = x + Render.Width / 7
+				Render:DrawText( Vector2(x,y+2), tostring(self.Players[i].deaths), Color(0,0,0) )
+				x = x + Render.Width / 7
+				Render:DrawText( Vector2(x,y+2), tostring(self.Players[i].ping), Color(0,0,0) )
 				y = y + Render:GetTextHeight("T") + 2
 			end
 		end	

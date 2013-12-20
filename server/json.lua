@@ -1,3 +1,4 @@
+ function json() 
   -- Module options:
     local always_try_using_lpeg = true
 
@@ -787,3 +788,4 @@
 	end
 
 	return json
+end

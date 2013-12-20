@@ -3,7 +3,6 @@ ZED = {}
 function ZED.Init(t)
 	ZED.Commands = {}
 	ZED.Players = {} 
-	ZED.PData = {}
 	ZED.CommandWhitelist = {derby=true, tp=true, boost=true,race=true,skydive=true}
 	ZED.ScoreBoardTimer = 0
 	ZED.ScoreBoardUpdateInterval = 200
@@ -20,14 +19,10 @@ function ZED.Init(t)
 	Events:Register( "ZEDPlayerQuit" )
 	Events:Register( "ZEDBroadcast" )
 	Events:Register( "ZEDReady" )
-	Events:Register( "GetPData" )
 	
-	Events:Subscribe( "GetPData", function(pdata)
-		ZED.PData = pdata
-	end)
 	Events:Subscribe( "ZEDAddCommand", function(args)
 		if(tostring(args.command))then
-			ZED.Commands[string.lower(args.command)] = args.do
+			ZED.Commands[string.lower(args.command)] = args.callback
 			return true
 		else
 			return false
@@ -47,16 +42,16 @@ function ZED.Init(t)
 	end)
 	Events:Subscribe("PlayerDeath", function(args)
 		if args.killer then		
-			if(ZED.PData:Get(args.killer).kills)then
-				ZED.PData:Set(args.killer, {kills=ZED.PData:Get(args.killer).kills+1})
+			if(PData:Get(args.killer).kills)then
+				PData:Set(args.killer, {kills=PData:Get(args.killer).kills+1})
 			else
-				ZED.PData:Set(args.killer, {kills=1})
+				PData:Set(args.killer, {kills=1})
 			end
 		end
-		if(ZED.PData:Get(args.player).deaths)then
-			ZED.PData:Set(args.player, {deaths=ZED.PData:Get(args.player).deaths+1})
+		if(PData:Get(args.player).deaths)then
+			PData:Set(args.player, {deaths=PData:Get(args.player).deaths+1})
 		else
-			ZED.PData:Set(args.player, {deaths=1})
+			PData:Set(args.player, {deaths=1})
 		end
 		Events:FireRegisteredEvent("ZEDPlayerDeath", {zed=ZED, args=args})
 		ZED:UpdatePlayerList()
@@ -113,7 +108,7 @@ function ZED.Init(t)
 		ZED:InitPlayer(ply)
 	end
 	
-	Events:FireRegisteredEvent("ZEDReady")
+	Events:FireRegisteredEvent("ZEDReady", ZED)
 	
 	ZED:UpdatePlayerList()
 end
@@ -138,7 +133,7 @@ ZED.strFind = function(t, v1, v2)
 end
 	
 ZED.PlayerHasPermission = function(t, ply, str)
-	for k,v in pairs(ZED.PData:Get(ply).permission) do
+	for k,v in pairs(PData:Get(ply).permission) do
 		if(v == "*")then return true end
 		if(string.lower(str) == string.lower(v))then
 			return true
@@ -150,7 +145,7 @@ ZED.PlayerHasPermission = function(t, ply, str)
 	return false
 end
 ZED.InitPlayer = function(tbl, ply)
-	ZED.PData:Load(ply, {permission={},kills=0,deaths=0})
+	PData:Load(ply, {permission={},kills=0,deaths=0})
 	Events:FireRegisteredEvent("PlayerInit", {zed=self, player=ply})
 end
 ZED.UpdatePlayerList = function(tbl)
@@ -160,7 +155,7 @@ ZED.UpdatePlayerList = function(tbl)
 		t.name = Config:GetValue("Server", "Name")
 
 		for v in Server:GetPlayers() do
-				table.insert(t.players, {Name=v:GetName(),BGColor=v:GetColor(),FGColor=Color(0,0,0),Kills=ZED.PData:Get(v).kills,Deaths=ZED.PData:Get(v).deaths,Ping=v:GetPing()})
+				table.insert(t.players, {Name=v:GetName(),BGColor=v:GetColor(),FGColor=Color(0,0,0),Kills=PData:Get(v).kills,Deaths=PData:Get(v).deaths,Ping=v:GetPing()})
 		end
 		Network:Broadcast( "ZEDUpdateBoard", t )
 	end

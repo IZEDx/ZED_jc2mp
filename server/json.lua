@@ -1,8 +1,3 @@
-if( not ZED ) then ZED = {}	ZED.Plugins = {} end
-
-
-MOD = {name="json"}
-MOD.Initialize = function()  
   -- Module options:
     local always_try_using_lpeg = true
 
@@ -792,8 +787,3 @@ MOD.Initialize = function()
 	end
 
 	return json
-
-end
-
-table.insert(ZED.Plugins, MOD)
--->

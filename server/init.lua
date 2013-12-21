@@ -1,16 +1,14 @@
 
 ZED = {}
 function ZED.Init(t)
-	ZED.Commands = {}
 	ZED.Players = {} 
-	ZED.CommandWhitelist = {derby=true, tp=true, boost=true,race=true,skydive=true}
 	ZED.ScoreBoardTimer = 0
 	ZED.ScoreBoardUpdateInterval = 200
+	ZED.ScoreBoardCustomField = {}
 	
 	Events:Register( "ZEDPlayerHasPermission" )
 	Events:Register( "ZEDPlayerInit" )
-	Events:Register( "ZEDAddCommand" )
-	Events:Register( "ZEDRemoveCommand" )
+	Events:Register( "ZEDExecuteCommand" )
 	Events:Register( "ZEDSendChatMessage" )
 	Events:Register( "ZEDScoreboardUpdate" )
 	Events:Register( "ZEDUpdateScoreboard" )
@@ -20,25 +18,20 @@ function ZED.Init(t)
 	Events:Register( "ZEDBroadcast" )
 	Events:Register( "ZEDReady" )
 	
-	Events:Subscribe( "ZEDAddCommand", function(args)
-		if(tostring(args.command))then
-			ZED.Commands[string.lower(args.command)] = args.callback
-			return true
-		else
-			return false
-		end
-	end)
 	Events:Subscribe( "ZEDRemoveCommand", function(args)
 		ZED.Commands[string.lower(args.command)] = nil
 	end)
 	Events:Subscribe( "ZEDSendChatMessage", function(args)
-		Network:Send( ply, "ZEDChat", args )
+		Network:Send( args.player, "ZEDChat", args.message )
 	end)
 	Events:Subscribe( "ZEDBroadcast", function(args)
 		Network:Broadcast( "ZEDChat", args )
 	end)
 	Events:Subscribe( "ZEDUpdateScoreboard", function(t)
-		Network:Broadcast( "ZEDUpdateBoard", t )
+		for k,v in pairs(t) do
+			ZED.ScoreBoardCustomField[k] = v
+		end
+		--Network:Broadcast( "ZEDUpdateBoard", t )
 	end)
 	Events:Subscribe("PlayerDeath", function(args)
 		if args.killer then		
@@ -59,28 +52,21 @@ function ZED.Init(t)
 	Events:Subscribe("PlayerChat", function(args)
 		if (args.text:sub(1, 1) ~= '/') then
 			Console:Print(args.player:GetName() .. ": " .. args.text)
-			if not Events:FireRegisteredEvent("ZEDPlayerChat", {zed=ZED, args=args}) then
+			if not Events:FireRegisteredEvent("ZEDPlayerChat", args) then
 				return false
 			end
-			ZED:Broadcast(Color(255,255,255), args.player:GetName(), Color(150,150,150), ": ", args.text)
+			ZED:Broadcast(args.player:GetColor(), args.player:GetName(), Color(150,150,150), ": ", args.text)
 			return false
 		end
 		local str = string.sub(args.text, 2)
 		local cmd = str:split(' ')
-		if( ZED.Commands[string.lower(cmd[1])] )then
-			if( not ZED:PlayerHasPermission(args.player, string.lower(cmd[1])))then
-				ZED:SendChatMessage(args.player, Color(200,0,0,255), "You have no access to this command: " .. string.lower(cmd[1]))
-				print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
-				return false
-			end
-			ZED.Commands[string.lower(cmd[1])](args.player, cmd)
-			print(args.player:GetName() .. " used command: " .. string.lower(args.text))
-		elseif( ZED.CommandWhitelist[string.lower(cmd[1])])then
-			print(args.player:GetName() .. " used whitelisted external command: " .. string.lower(args.text))
-		else
-			ZED:SendChatMessage(args.player, Color(200,0,0,255), "Command not found: " .. string.lower(cmd[1]))
+		if( not ZED:PlayerHasPermission(args.player, string.lower(cmd[1])))then
+			ZED:SendChatMessage(args.player, Color(200,0,0,255), "You have no access to this command: " .. string.lower(cmd[1]))
 			print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
+			return false
 		end
+		Events:FireRegisteredEvent("ZEDExecuteCommand", {player=args.player, cmd=cmd})
+		print(args.player:GetName() .. " used command: " .. string.lower(args.text))
 		return false
 	end)
 	Events:Subscribe("PlayerJoin", function(args)
@@ -95,6 +81,7 @@ function ZED.Init(t)
 			ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
 		end
 		ZED:UpdatePlayerList()
+		PData:Save(args.player)
 	end)
 	Events:Subscribe("PreTick", function()
 		ZED.ScoreBoardTimer = ZED.ScoreBoardTimer + 1
@@ -139,24 +126,47 @@ ZED.PlayerHasPermission = function(t, ply, str)
 			return true
 		end
 	end
-	if Events:FireRegisteredEvent("PlayerHasPermission", {zed=self, player=ply, permission=str}) then
-		return true
+	if not Events:FireRegisteredEvent("PlayerHasPermission", {player=ply, permission=str}) then
+		return false
 	end
 	return false
 end
 ZED.InitPlayer = function(tbl, ply)
 	PData:Load(ply, {permission={},kills=0,deaths=0})
-	Events:FireRegisteredEvent("PlayerInit", {zed=self, player=ply})
+	Events:FireRegisteredEvent("ZEDPlayerInit", {player=ply})
 end
 ZED.UpdatePlayerList = function(tbl)
-	if Events:FireRegisteredEvent("ZEDScoreboardUpdate", {zed=tbl}) then
+	if Events:FireRegisteredEvent("ZEDScoreboardUpdate", true) then
 		local t = {}
 		t.players = {}
 		t.name = Config:GetValue("Server", "Name")
-
-		for v in Server:GetPlayers() do
-				table.insert(t.players, {Name=v:GetName(),BGColor=v:GetColor(),FGColor=Color(0,0,0),Kills=PData:Get(v).kills,Deaths=PData:Get(v).deaths,Ping=v:GetPing()})
-		end
+		t.maxplayers = Config:GetValue("Server", "MaxPlayers")
+		t.header = {"#","Name", "Kills", "Deaths"}
+		
+		--for i = 0, 144, 1 do
+			for v in Server:GetPlayers() do
+				local p = {v:GetId(),v:GetName(),BGColor=v:GetColor(),FGColor=Color(0,0,0),PData:Get(v).kills,PData:Get(v).deaths}
+				for k,i in pairs(ZED.ScoreBoardCustomField) do
+					if k == "BGColor" or k == "FGColor" then
+						p[k] = i[v:GetId()]
+					else
+						table.insert(p, i[v:GetId()])
+						local found = false
+						for g,h in pairs(t.header) do
+							if(h == k)then
+								found = true
+							end
+						end
+						if not found then
+							table.insert(t.header, k)
+						end
+					end
+				end
+				table.insert(p, v:GetPing())
+				table.insert(t.players,p)
+			end
+		--end
+		table.insert(t.header, "Ping")
 		Network:Broadcast( "ZEDUpdateBoard", t )
 	end
 end
@@ -175,7 +185,9 @@ ZED.Broadcast = function(tbl, ...)
         Network:Broadcast( "ZEDChat", {...} )
 end
 
- 
+local initialized = false
 Events:Subscribe("ModulesLoad", function(args)
-	ZED:Init()
+	if not initalized then
+		ZED:Init()
+	end
 end)

@@ -1,9 +1,11 @@
 class 'ZEDChat'
 
 function ZEDChat:__init()
-	Events:Register("ZEDTunnel")
 	self.History = {}
 	self.ChatEnabled = true
+	
+	Events:Register("ZEDTunnel")
+	
     Network:Subscribe( "ZEDChat", self, self.Chat )
     Events:Subscribe( "Render", self, self.Render )
     Events:Subscribe( "KeyDown", self, self.KeyDown )

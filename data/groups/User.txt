@@ -1,1 +1,0 @@
-{"name":"User","permission":["help","version","who","getpos","veh","wep","model","jump","warp","info"],"color":[100,100,100]}

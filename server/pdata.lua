@@ -50,7 +50,8 @@ end
 PData.Load = function(t,ply, default)
 	local file = io.open("./data/player/" .. string.gsub(tostring(ply:GetSteamId()), ":", "-") .. ".txt", "r")
 	if(file)then
-		local ret = json():decode(file:read("*all"))
+		local json = json()
+		local ret = json:decode(file:read("*all"))
 		if(ret)then
 			if(default)then
 				for k,v in pairs(default) do

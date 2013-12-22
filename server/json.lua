@@ -485,6 +485,7 @@
 	end
 
 	local function scanwhite (str, pos)
+		--print(str, pos)
 	  while true do
 		pos = strfind (str, "%S", pos)
 		if not pos then return nil end
@@ -676,7 +677,7 @@
 	  end
 	end
 
-	function json.decode (str, pos, nullval, ...)
+	function json.decode (tbl, str, pos, nullval, ...)
 	  local objectmeta, arraymeta = optionalmetatables(...)
 	  return scanvalue (str, pos, nullval, objectmeta, arraymeta)
 	end

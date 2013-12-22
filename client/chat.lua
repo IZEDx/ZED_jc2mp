@@ -4,7 +4,7 @@ function ZEDChat:__init()
 	self.History = {}
 	self.ChatEnabled = true
 	
-	Events:Register("ZEDTunnel")
+	--Events:Register("ZEDTunnel") -- Deprecated
 	
     Network:Subscribe( "ZEDChat", self, self.Chat )
     Events:Subscribe( "Render", self, self.Render )

@@ -4,6 +4,8 @@ ZED.Players = {}
 ZED.ScoreBoardTimer = 0
 ZED.ScoreBoardUpdateInterval = 200
 ZED.ScoreBoardCustomField = {}
+ZED.ScoreBoardExtraField = {}
+ZED.ScoreBoardButtons = {}
 ZED.LastMessages = {}
 	
 function ZED.Init(t)
@@ -39,10 +41,29 @@ Events:Subscribe( "ZEDBroadcast", function(args)
 	Network:Broadcast( "ZEDChat", args )
 end)
 Events:Subscribe( "ZEDUpdateScoreboard", function(t)
-	for k,v in pairs(t) do
-		ZED.ScoreBoardCustomField[k] = v
+	if(t.Columns)then
+		for k,v in pairs(t.Columns) do
+			ZED.ScoreBoardCustomField[k] = v
+		end
+	end
+	if(t.Extra)then
+		for k,v in pairs(t.Extra) do
+			ZED.ScoreBoardExtraField[k] = v
+		end
+	end
+	if(t.Buttons)then
+		for k,v in pairs(t.Buttons) do
+			ZED.ScoreBoardButtons[k] = v
+		end
 	end
 	--Network:Broadcast( "ZEDUpdateBoard", t )
+end)
+Network:Subscribe("ZEDButtonClick", function(args)
+	local cmd = args
+	Events:Fire("ZEDExecuteCommand", {player=args.player, cmd=cmd})
+	ZED:SendChatMessage(args.player, Color(200,200,0), "You pressed a button with command: " .. args.text)
+	print(args.player:GetName() .. " pressed button: " .. string.lower(args.text))
+	return false
 end)
 Events:Subscribe("PlayerDeath", function(args)
 	if args.killer then		
@@ -192,6 +213,14 @@ ZED.UpdatePlayerList = function(tbl)
 							table.insert(t.header, k)
 						end
 					end
+				end
+				p.ExtraInfo = {}
+				p.Buttons = {}
+				for k,i in pairs(ZED.ScoreBoardExtraField) do
+					p.ExtraInfo[k] = i[v:GetId()]
+				end
+				for k,i in pairs(ZED.ScoreBoardButtons) do
+					p.Buttons[k] = i[v:GetId()]
 				end
 				table.insert(p, v:GetPing())
 				table.insert(t.players,p)

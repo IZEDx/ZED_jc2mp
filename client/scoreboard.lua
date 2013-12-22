@@ -6,6 +6,8 @@ function ZEDBoard:__init()
 	self.ServerName = ""
 	self.ScrollPosition = 0
 	self.MaxPlayers = 0
+	self.ViewPlayer = -1
+	self.Buttons = {}
 	self.PossibleItems = (Render.Height - 200)/(Render:GetTextHeight("T", 25)+2)
 	self.blacklist = {Action.LookLeft, Action.LookRight, Action.LookUp, Action.LookDown, Action.PrevWeapon, Action.NextWeapon, Action.FireRight, Action.FireLeft, Action.VehicleFireLeft, Action.VehicleFireRight}
 	
@@ -33,13 +35,42 @@ end
 
 function ZEDBoard:Render( args )
 	if(Key:IsDown(9))then
+		local mpos = Mouse:GetPosition()
+		local modX = 0
 		local y = 30
-		Render:FillArea(Vector2(Render.Width/5-20,y), Vector2(Render.Width /5*3+40, 100 + (Render.Height - 200)), Color(0,0,0,150))
-		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth(self.ServerName, 20)/2,y+10), self.ServerName, Color(255,255,255), 20 )
-		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", 18)/2,y+30), "Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", Color(255,255,255), 18 )
+		if(self.ViewPlayer > -1)then
+			modX = Render.Width / 5 * 0.5
+			local x = Render.Width/5 * 0.5
+			local width = Render.Width /5*1
+			Render:FillArea(Vector2(x -40,y), Vector2(Render.Width /5*1 - 10, 100 + (Render.Height - 200)), Color(0,0,0,150))
+			local y2 = y+20
+			local y = y2
+			for k,v in pairs(self.Header) do
+				Render:DrawText( Vector2(x-Render:GetTextWidth(v .. ": ") + width/10,y), tostring(v .. ": "), Color(255,255,255) )
+				Render:DrawText( Vector2(x + width/8,y), tostring(self.Players[self.ViewPlayer][k]), Color(255,255,255) )
+				y = y + 20
+			end
+			for k,v in pairs(self.Players[self.ViewPlayer].ExtraInfo) do
+				Render:DrawText( Vector2(x-Render:GetTextWidth(k .. ": ") + width/10,y), tostring(k .. ": "), Color(255,255,255) )
+				Render:DrawText( Vector2(x + width/8,y), tostring(v), Color(255,255,255) )
+				y = y + 20
+			end
+			for k,v in pairs(self.Players[LocalPlayer:GetId()].Buttons) do
+				if mpos.x > x -20 and mpos.x < x-20 + Render.Width / 5 -50 and mpos.y >= y and mpos.y <= y + 20 then
+					Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(100,100,100,150))
+				else
+					Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(200,200,200,150))
+				end
+				Render:DrawText( Vector2(x-Render:GetTextWidth(k)/2 + width/3,y+3), tostring(k), Color(255,255,255) )
+				y = y + 25
+			end
+		end
+		Render:FillArea(Vector2(Render.Width/5-20 + modX,y), Vector2(Render.Width /5*3+40, 100 + (Render.Height - 200)), Color(0,0,0,150))
+		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth(self.ServerName, 20)/2,y+10), self.ServerName, Color(255,255,255), 20 )
+		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth("Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", 18)/2,y+30), "Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", Color(255,255,255), 18 )
 		
 		y = y + 50
-		local x = Render.Width / 5 + 20
+		local x = Render.Width / 5 + 20 + modX
 		
 		local minpercentages = {}
 		local totalpercentages = 100
@@ -68,8 +99,12 @@ function ZEDBoard:Render( args )
 		local height = Render:GetTextHeight("T", 25) + 2
 		for i = math.floor(self.ScrollPosition) + 1,math.floor(self.ScrollPosition) + 1+self.PossibleItems,1 do
 			if(self.Players[i])then
-				x = Render.Width / 5
-				Render:FillArea(Vector2(x,y), Vector2(Render.Width /5*3, Render:GetTextHeight("T", 25) + 2), self.Players[i].BGColor)
+				x = Render.Width / 5 + modX
+				if mpos.x > x and mpos.x < x + Render.Width/5*3 and mpos.y >= y and mpos.y < y + Render:GetTextHeight("T", 25) + 2 then
+					Render:FillArea(Vector2(x-10,y), Vector2(Render.Width /5*3+20, Render:GetTextHeight("T", 25) + 2), self.Players[i].BGColor)
+				else
+					Render:FillArea(Vector2(x,y), Vector2(Render.Width /5*3, Render:GetTextHeight("T", 25) + 2), self.Players[i].BGColor)
+				end
 				local c = 1
 				for k,v in pairs(self.Players[i]) do
 					if(type(v) == "string" or type(v) == "number")then
@@ -78,7 +113,7 @@ function ZEDBoard:Render( args )
 						c = c + 1
 					end
 				end
-				y = y + height
+				y = y + height + 1
 			end
 		end	
 	end
@@ -118,14 +153,44 @@ function ZEDBoard:MouseDown( args )
 		local width = Render.Width /5*3
 		local x = Render.Width / 5 
 		local mpos = Mouse:GetPosition()
+		local found = false
 		for i = math.floor(self.ScrollPosition) + 1,math.floor(self.ScrollPosition) + 1+self.PossibleItems,1 do
 			if(self.Players[i])then
 				if(mpos.x >= x and mpos.x <= x + width and mpos.y >= y and mpos.y <= y + height)then
-					print(self.Players[i][1])
+					found = true
+					self.ViewPlayer = self.Players[i][1]
 				end
-				y = y + height
+				y = y + height + 1
 			end
 		end	
+		if(self.ViewPlayer > -1)then
+			local x = Render.Width/5 * 0.5 - 40
+			local width = Render.Width /5*1 - 10
+			local y = 30
+			local height = 100 + (Render.Height - 200)
+			if mpos.x >= x and mpos.x <= x+width and mpos.y >= y and mpos.y <= y+height then
+				found = true
+				local x = Render.Width/5 * 0.5
+				local width = Render.Width /5*1
+				local y2 = y+20
+				local y = y2
+				for k,v in pairs(self.Header) do
+					y = y + 20
+				end
+				for k,v in pairs(self.Players[self.ViewPlayer].ExtraInfo) do
+					y = y + 20
+				end
+				for k,v in pairs(self.Players[LocalPlayer:GetId()].Buttons) do
+					if mpos.x >= x-20 and mpos.x <= x-20+Render.Width /5*1 - 50 and mpos.y >=y and mpos.y <= y + 20 then
+						Network:Send("ZEDButtonClick", {player=LocalPlayer, text=v .. " " .. tostring(self.ViewPlayer), v, self.ViewPlayer})
+					end
+					y = y + 25
+				end
+			end
+		end
+		if not found then
+			self.ViewPlayer = -1
+		end
 	end
 end
 

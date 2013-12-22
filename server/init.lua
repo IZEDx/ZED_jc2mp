@@ -1,9 +1,10 @@
 
 ZED = {}
-	ZED.Players = {} 
-	ZED.ScoreBoardTimer = 0
-	ZED.ScoreBoardUpdateInterval = 200
-	ZED.ScoreBoardCustomField = {}
+ZED.Players = {} 
+ZED.ScoreBoardTimer = 0
+ZED.ScoreBoardUpdateInterval = 200
+ZED.ScoreBoardCustomField = {}
+ZED.LastMessages = {}
 	
 function ZED.Init(t)
 	
@@ -60,6 +61,18 @@ Events:Subscribe("PlayerDeath", function(args)
 	ZED:UpdatePlayerList()
 end)
 Events:Subscribe("PlayerChat", function(args)
+	if( ZED.LastMessages[args.player:GetId()] )then
+		msgData = ZED.LastMessages[args.player:GetId()]
+		if( ZED:strEquals(msgData.msg, args.text) ) then
+			if( msgData.time + 3 > os.clock() )then
+				ZED:SendChatMessage(args.player, Color(200,0,0), "Please do not spam!")
+				return false
+			end
+		end
+		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}
+	else
+		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}
+	end
 	if (args.text:sub(1, 1) ~= '/') then
 		Console:Print(args.player:GetName() .. ": " .. args.text)
 		if not Events:Fire("ZEDPlayerChat", args) then
@@ -92,6 +105,7 @@ Events:Subscribe("PlayerQuit", function(args)
 	end
 	ZED:UpdatePlayerList()
 	PData:Save(args.player)
+	ZED.LastMessages[args.player:GetId()] = nil
 end)
 Events:Subscribe("PreTick", function()
 	ZED.ScoreBoardTimer = ZED.ScoreBoardTimer + 1
@@ -99,6 +113,15 @@ Events:Subscribe("PreTick", function()
 		ZED:UpdatePlayerList()
 		ZED.ScoreBoardTimer = 0
 	end
+end)
+Events:Subscribe( "ZEDPlayerHasPermission", function(args)
+	for k,v in pairs(PData:Get(args.player).permission) do
+		if(v == "*")then return true end
+		if(string.lower(args.permission) == string.lower(v))then
+			return false
+		end
+	end
+	return true
 end)
 
 -- START ZEDTunnel
@@ -132,13 +155,8 @@ ZED.strFind = function(t, v1, v2)
 	end
 end
 	
+
 ZED.PlayerHasPermission = function(t, ply, str)
-	for k,v in pairs(PData:Get(ply).permission) do
-		if(v == "*")then return true end
-		if(string.lower(str) == string.lower(v))then
-			return true
-		end
-	end
 	if not Events:Fire("ZEDPlayerHasPermission", {player=ply, permission=str}) then
 		return true
 	end

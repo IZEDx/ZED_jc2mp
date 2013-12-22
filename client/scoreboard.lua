@@ -39,10 +39,10 @@ function ZEDBoard:Render( args )
 		Render:DrawText( Vector2(Render.Width/2 - Render:GetTextWidth("Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", 18)/2,y+30), "Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", Color(255,255,255), 18 )
 		
 		y = y + 50
-		local x = Render.Width / 5
+		local x = Render.Width / 5 + 20
 		
 		local minpercentages = {}
-		local totalpercentages = 0
+		local totalpercentages = 100
 		local maxWidth = ( Render.Width /5*3 )
 		local xPositions = {}
 		for k,v in pairs(self.Header) do
@@ -54,13 +54,14 @@ function ZEDBoard:Render( args )
 				end
 			end
 			minpercentages[k] = 100 / maxWidth * biggestWidth 
-			totalpercentages = totalpercentages + minpercentages[k]
+			totalpercentages = totalpercentages - minpercentages[k]
 		end
 		for k,v in pairs(self.Header) do
 			--if(type(v) == "string" or type(v) == "number")then
 			Render:DrawText( Vector2(x+10,y+2), v, Color(200,200,200),13 )
-			xPositions[k] = x+10
-			x = x + (maxWidth / 100 * (100-totalpercentages))/#self.Header + maxWidth / 100 * minpercentages[k] + 20
+			xPositions[k] = x + 10
+			print(#self.Header)
+			x = x + (maxWidth / 100 * totalpercentages)/#self.Header + maxWidth / 100 * minpercentages[k]
 			--end
 		end
 		

@@ -60,7 +60,6 @@ function ZEDBoard:Render( args )
 			--if(type(v) == "string" or type(v) == "number")then
 			Render:DrawText( Vector2(x+10,y+2), v, Color(200,200,200),13 )
 			xPositions[k] = x + 10
-			print(#self.Header)
 			x = x + (maxWidth / 100 * totalpercentages)/#self.Header + maxWidth / 100 * minpercentages[k]
 			--end
 		end

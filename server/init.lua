@@ -91,16 +91,16 @@ Events:Subscribe("PlayerDeath", function(args)
 end)
 Events:Subscribe("PlayerChat", function(args)
 	if( ZED.LastMessages[args.player:GetId()] )then
-		local msgData = ZED.LastMessages[args.player:GetId()]
 		--if( ZED:strEquals(msgData.msg, args.text) ) then
-		if( msgData.time + 3 > os.clock() ) and Events:Fire("ZEDPlayerHasPermission", {player=args.player, permission="spambypass"}) then
+		if( ZED.LastMessages[args.player:GetId()].timer:GetSeconds() < 3 ) and Events:Fire("ZEDPlayerHasPermission", {player=args.player, permission="spambypass"}) then
 			ZED:SendChatMessage(args.player, Color(200,0,0), "Please do not spam!")
 			return false
 		end
 		--end
-		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}
+		ZED.LastMessages[args.player:GetId()].timer:Restart()
+		ZED.LastMessages[args.player:GetId()].msg = args.text
 	else
-		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}
+		ZED.LastMessages[args.player:GetId()] = {msg = args.text, timer = Timer()}
 	end
 	if (args.text:sub(1, 1) ~= '/') then
 		Console:Print(args.player:GetName() .. ": " .. args.text)

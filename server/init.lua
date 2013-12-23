@@ -31,8 +31,12 @@ Events:Register( "ZEDPlayerQuit" )
 Events:Register( "ZEDBroadcast" )
 Events:Register( "ZEDReady" )]]
 
-Events:Subscribe( "ZEDRemoveCommand", function(args)
-	ZED.Commands[string.lower(args.command)] = nil
+Events:Subscribe("ZEDNotify", function(args)
+	if(args.player)then
+		Network:Send(args.player, "ZEDNotify", args)
+	else
+		Network:Broadcast("ZEDNotify", args)
+	end
 end)
 Events:Subscribe( "ZEDSendChatMessage", function(args)
 	Network:Send( args.player, "ZEDChat", args.message )
@@ -82,13 +86,13 @@ Events:Subscribe("PlayerDeath", function(args)
 end)
 Events:Subscribe("PlayerChat", function(args)
 	if( ZED.LastMessages[args.player:GetId()] )then
-		msgData = ZED.LastMessages[args.player:GetId()]
-		if( ZED:strEquals(msgData.msg, args.text) ) then
-			if( msgData.time + 3 > os.clock() )then
-				ZED:SendChatMessage(args.player, Color(200,0,0), "Please do not spam!")
-				return false
-			end
+		local msgData = ZED.LastMessages[args.player:GetId()]
+		--if( ZED:strEquals(msgData.msg, args.text) ) then
+		if( msgData.time + 3 > os.clock() ) and Events:Fire("ZEDPlayerHasPermission", {player=args.play, permission="spambypass"}) then
+			ZED:SendChatMessage(args.player, Color(200,0,0), "Please do not spam!")
+			return false
 		end
+		--end
 		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}
 	else
 		ZED.LastMessages[args.player:GetId()] = {msg = args.text, time = os.clock()}

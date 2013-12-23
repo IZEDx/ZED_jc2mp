@@ -18,11 +18,11 @@ Interested ? Contact me: admin@i-zed.net
 
 How to install ZED:
 --------
-Download the Sourcecode as .zip
-Create a new folder in scripts called "ZED"
-Drag'n'drop all the content from the .zip into the new created folder.
-Type in "load ZED" into the console or restart the server.
- * Tip: If you are using other modules that use the chat to print out messages, install ZEDTunnel.
+* Download the Sourcecode as .zip
+* Create a new folder in scripts called "ZED"
+* Drag'n'drop all the content from the .zip into the new created folder.
+* Type in "load ZED" into the console or restart the server.
+* Tip: If you are using other modules that use the chat to print out messages, install ZEDTunnel.
 
 
 

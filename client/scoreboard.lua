@@ -45,24 +45,34 @@ function ZEDBoard:Render( args )
 			Render:FillArea(Vector2(x -40,y), Vector2(Render.Width /5*1 - 10, 100 + (Render.Height - 200)), Color(0,0,0,150))
 			local y2 = y+20
 			local y = y2
-			for k,v in pairs(self.Header) do
-				Render:DrawText( Vector2(x-Render:GetTextWidth(v .. ": ") + width/10,y), tostring(v .. ": "), Color(255,255,255) )
-				Render:DrawText( Vector2(x + width/8,y), tostring(self.Players[self.ViewPlayer][k]), Color(255,255,255) )
-				y = y + 20
-			end
-			for k,v in pairs(self.Players[self.ViewPlayer].ExtraInfo) do
-				Render:DrawText( Vector2(x-Render:GetTextWidth(k .. ": ") + width/10,y), tostring(k .. ": "), Color(255,255,255) )
-				Render:DrawText( Vector2(x + width/8,y), tostring(v), Color(255,255,255) )
-				y = y + 20
-			end
-			for k,v in pairs(self.Players[LocalPlayer:GetId()].Buttons) do
-				if mpos.x > x -20 and mpos.x < x-20 + Render.Width / 5 -50 and mpos.y >= y and mpos.y <= y + 20 then
-					Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(100,100,100,150))
-				else
-					Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(200,200,200,150))
+			for _,ply in pairs(self.Players) do
+				if(ply[1] == self.ViewPlayer)then
+					for k,v in pairs(self.Header) do
+						Render:DrawText( Vector2(x-Render:GetTextWidth(v .. ": ") + width/10,y), tostring(v .. ": "), Color(255,255,255) )
+						Render:DrawText( Vector2(x + width/8,y), tostring(ply[k]), Color(255,255,255) )
+						y = y + 20
+					end
+					for k,v in pairs(ply.ExtraInfo) do
+						Render:DrawText( Vector2(x-Render:GetTextWidth(k .. ": ") + width/10,y), tostring(k .. ": "), Color(255,255,255) )
+						Render:DrawText( Vector2(x + width/8,y), tostring(v), Color(255,255,255) )
+						y = y + 20
+					end
+					break
 				end
-				Render:DrawText( Vector2(x-Render:GetTextWidth(k)/2 + width/3,y+3), tostring(k), Color(255,255,255) )
-				y = y + 25
+			end
+			for _,lply in pairs(self.Players) do
+				if(lply[1] == LocalPlayer:GetId())then
+					for k,v in pairs(lply.Buttons) do
+						if mpos.x > x -20 and mpos.x < x-20 + Render.Width / 5 -50 and mpos.y >= y and mpos.y <= y + 20 then
+							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(100,100,100,150))
+						else
+							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(200,200,200,150))
+						end
+						Render:DrawText( Vector2(x-Render:GetTextWidth(k)/2 + width/3,y+3), tostring(k), Color(255,255,255) )
+						y = y + 25
+					end
+					break
+				end
 			end
 		end
 		Render:FillArea(Vector2(Render.Width/5-20 + modX,y), Vector2(Render.Width /5*3+40, 100 + (Render.Height - 200)), Color(0,0,0,150))
@@ -116,6 +126,9 @@ function ZEDBoard:Render( args )
 				y = y + height + 1
 			end
 		end	
+		local credits = "ZED V2.0"
+		Render:FillArea(Vector2(Render.Width/5-20 + modX,Render.Height - 30), Vector2(Render.Width /5*3+40, 30), Color(0,0,0,150))
+		Render:DrawText( Vector2(Render.Width/2-20 + modX,Render.Height - 20), tostring(credits), Color(200,200,200), 15 )
 	end
 end
 
@@ -177,14 +190,24 @@ function ZEDBoard:MouseDown( args )
 				for k,v in pairs(self.Header) do
 					y = y + 20
 				end
-				for k,v in pairs(self.Players[self.ViewPlayer].ExtraInfo) do
-					y = y + 20
-				end
-				for k,v in pairs(self.Players[LocalPlayer:GetId()].Buttons) do
-					if mpos.x >= x-20 and mpos.x <= x-20+Render.Width /5*1 - 50 and mpos.y >=y and mpos.y <= y + 20 then
-						Network:Send("ZEDButtonClick", {player=LocalPlayer, text=v .. " " .. tostring(self.ViewPlayer), v, self.ViewPlayer})
+				for _,ply in pairs(self.Players) do
+					if(ply[1] == self.ViewPlayer)then
+						for k,v in pairs(ply.ExtraInfo) do
+							y = y + 20
+						end
+						break
 					end
-					y = y + 25
+				end
+				for _,ply in pairs(self.Players) do
+					if(ply[1] == LocalPlayer:GetId())then
+						for k,v in pairs(ply.Buttons) do
+							if mpos.x >= x-20 and mpos.x <= x-20+Render.Width /5*1 - 50 and mpos.y >=y and mpos.y <= y + 20 then
+								Network:Send("ZEDButtonClick", {player=LocalPlayer, text=v .. " " .. tostring(self.ViewPlayer), v, self.ViewPlayer})
+							end
+							y = y + 25
+						end
+						break
+					end
 				end
 			end
 		end

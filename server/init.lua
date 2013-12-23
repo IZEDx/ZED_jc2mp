@@ -61,7 +61,6 @@ end)
 Network:Subscribe("ZEDButtonClick", function(args)
 	local cmd = args
 	Events:Fire("ZEDExecuteCommand", {player=args.player, cmd=cmd})
-	ZED:SendChatMessage(args.player, Color(200,200,0), "You pressed a button with command: " .. args.text)
 	print(args.player:GetName() .. " pressed button: " .. string.lower(args.text))
 	return false
 end)
@@ -96,6 +95,9 @@ Events:Subscribe("PlayerChat", function(args)
 	end
 	if (args.text:sub(1, 1) ~= '/') then
 		Console:Print(args.player:GetName() .. ": " .. args.text)
+		if not Events:Fire("ZEDAllowPlayerChat", args) then
+			return false
+		end
 		if not Events:Fire("ZEDPlayerChat", args) then
 			return false
 		end
@@ -108,6 +110,9 @@ Events:Subscribe("PlayerChat", function(args)
 		ZED:SendChatMessage(args.player, Color(200,0,0,255), "You have no access to this command: " .. string.lower(cmd[1]))
 		print(args.player:GetName() .. " tried using command: " .. string.lower(args.text))
 		return false
+	end
+	if ZED:strEquals(cmd[1], "version") then
+		ZED:SendChatMessage(args.player, Color(0,150,200),"This server is runnig ZED V2.0", Color(0,150,200))
 	end
 	Events:Fire("ZEDExecuteCommand", {player=args.player, cmd=cmd})
 	print(args.player:GetName() .. " used command: " .. string.lower(args.text))
@@ -136,10 +141,12 @@ Events:Subscribe("PreTick", function()
 	end
 end)
 Events:Subscribe( "ZEDPlayerHasPermission", function(args)
-	for k,v in pairs(PData:Get(args.player).permission) do
-		if(v == "*")then return true end
-		if(string.lower(args.permission) == string.lower(v))then
-			return false
+	if(PData:Get(args.player).permission)then
+		for k,v in pairs(PData:Get(args.player).permission) do
+			if(v == "*")then return true end
+			if(string.lower(args.permission) == string.lower(v))then
+				return false
+			end
 		end
 	end
 	return true

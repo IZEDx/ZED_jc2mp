@@ -9,7 +9,7 @@ Documentation can be found in the Wiki.
 
 Here are my official supported plugins for ZED:
 
-[Groups](https://github.com/IZEDx/Groups)
+[Groups](https://github.com/IZEDx/Groups) | 
 [Essentials](https://github.com/IZEDx/Essentials)
 
 Also fully supported is a Teams plugin which I'm currently selling.

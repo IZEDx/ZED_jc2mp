@@ -87,13 +87,13 @@ Events:Subscribe("PlayerDeath", function(args)
 		PData:Set(args.player, {deaths=1})
 	end
 	Events:Fire("ZEDPlayerDeath", {zed=ZED, args=args})
-	ZED:UpdatePlayerList()
+	ZED:UpdatePlayerList() 
 end)
 Events:Subscribe("PlayerChat", function(args)
 	if( ZED.LastMessages[args.player:GetId()] )then
 		local msgData = ZED.LastMessages[args.player:GetId()]
 		--if( ZED:strEquals(msgData.msg, args.text) ) then
-		if( msgData.time + 3 > os.clock() ) and Events:Fire("ZEDPlayerHasPermission", {player=args.play, permission="spambypass"}) then
+		if( msgData.time + 3 > os.clock() ) and Events:Fire("ZEDPlayerHasPermission", {player=args.player, permission="spambypass"}) then
 			ZED:SendChatMessage(args.player, Color(200,0,0), "Please do not spam!")
 			return false
 		end

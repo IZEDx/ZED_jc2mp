@@ -1,4 +1,4 @@
-ZED V2.0
+ZED V2.0a
 =====
 
 This is the currently most stable version of ZED.

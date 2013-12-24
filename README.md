@@ -34,4 +34,4 @@ How to install ZEDTunnel:
 * Download [ZEDTunnel](https://github.com/evildev/ZED/releases/download/2.0/ZEDTunnel.zip).
 * Open the ZIP-Archive
 * Open your jcmp/scripts folder
-* Drag'n'Drop the client/server folders out of the ZIP-Archive into every module in your scripts folder.
+* Drag'n'Drop the shared folders out of the ZIP-Archive into every module in your scripts folder.

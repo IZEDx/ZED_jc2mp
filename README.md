@@ -8,8 +8,7 @@ Documentation can be found in the Wiki.
 
 
 Here are my official supported plugins for ZED:
-
-[Groups](https://github.com/IZEDx/Groups) | [Essentials](https://github.com/IZEDx/Essentials)
+[Groups](https://github.com/evildev/Groups) | [Essentials](https://github.com/evildev/Essentials)
 
 Also fully supported is a Teams plugin which I'm currently selling.
 It features all the features from the official factions plugin + even more.

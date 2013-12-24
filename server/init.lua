@@ -140,6 +140,7 @@ Events:Subscribe("PlayerQuit", function(args)
 	end
 	ZED:UpdatePlayerList()
 	PData:Save(args.player)
+	PData:Delete(args.player)
 	ZED.LastMessages[args.player:GetId()] = nil
 end)
 Events:Subscribe("PreTick", function()

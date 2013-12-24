@@ -20,6 +20,9 @@ PData.Set = function(t,ply, tbl)
 		PData.Players[ply:GetId()][k] = v
 	end
 end
+PData.Delete = function(t,ply)
+	PData.Players[ply:GetId()] = nil
+end
 
 PData.Exists = function( t,ply)
 	if(ZED:file_exists("./data/player/" .. string.gsub(tostring(ply:GetSteamId()), ":", "-") .. ".txt"))then

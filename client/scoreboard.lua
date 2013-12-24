@@ -166,11 +166,16 @@ function ZEDBoard:KeyDown( args )
 	end
 end
 function ZEDBoard:MouseDown( args )
-	if(args.button == 1)then
+	if (args.button == 1) and Key:IsDown(9) then
 		local y = 100
 		local height = Render:GetTextHeight("T", 25) + 2
 		local width = Render.Width /5*3
 		local x = Render.Width / 5 
+		local modX = 0
+		if(self.ViewPlayer > -1)then
+			modX = Render.Width / 5 * 0.5
+		end
+		x = x + modX
 		local mpos = Mouse:GetPosition()
 		local found = false
 		for i = math.floor(self.ScrollPosition) + 1,math.floor(self.ScrollPosition) + 1+self.PossibleItems,1 do

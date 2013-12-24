@@ -7,7 +7,87 @@
 class 'ZEDChat'
 
 function ZEDChat:__init()
-	self.History = {}
+	self.History = {
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}},
+		{{text="", color=Color(0,0,0)}}
+	}
 	self.ChatEnabled = true
 	
 	--Events:Register("ZEDTunnel") -- Deprecated
@@ -41,10 +121,14 @@ end
 
 function ZEDChat:Render( args )
 	if(self.ChatEnabled)then
-		local y = Render.Height/3*1.835
 		local bigwidth = 0
+		local ysize = 4
+		if(Chat:GetActive())then
+			ysize = 1.7
+		end
+		local y = Render.Height/3*1.835 + (Render.Height/4 - Render.Height/ysize)
 		for i,j in ipairs(self.History) do
-			if(i > #self.History - math.floor(Render.Height/4/(Render:GetTextHeight("T")+0.3)))then
+			if(i > #self.History - math.floor(Render.Height/ysize/(Render:GetTextHeight("T")+0.3)))then
 				local width = 0
 				for k,v in pairs(j) do
 					width = width + Render:GetTextWidth( v.text )
@@ -55,10 +139,10 @@ function ZEDChat:Render( args )
 			end
 		end
 		if(Chat:GetActive() and bigwidth > 0)then
-			Render:FillArea(Vector2(25,y-2), Vector2( bigwidth + 15, Render.Height/4 ), Color(0,0,0,100))
+			Render:FillArea(Vector2(25,y-2), Vector2( bigwidth + 15, Render.Height/ysize ), Color(0,0,0,100))
 		end
 		for i,j in ipairs(self.History) do
-			if(i > #self.History - math.floor(Render.Height/4/(Render:GetTextHeight("T")+0.3)))then
+			if(i > #self.History - math.floor(Render.Height/ysize/(Render:GetTextHeight("T")+0.3)))then
 				local x = 31
 				for k,v in pairs(j) do
 					Render:DrawText( Vector2(x,y+5) + Vector2( 1, 1 ), v.text, Color(0,0,0,150) )

@@ -116,7 +116,7 @@ Events:Subscribe("PlayerChat", function(args)
 	local str = string.sub(args.text, 2)
 	local cmd = str:split(' ')
 	if ZED:strEquals(cmd[1], "version") then
-		ZED:SendChatMessage(args.player, Color(0,150,200),"This server is runnig ZED V2.1", Color(0,150,200))
+		ZED:SendChatMessage(args.player, Color(0,150,200),"This server is runnig ZED V2.0a", Color(0,150,200))
 	else
 		if( not ZED:PlayerHasPermission(args.player, string.lower(cmd[1])))then
 			ZED:SendChatMessage(args.player, Color(200,0,0,255), "You have no access to this command: " .. string.lower(cmd[1]))

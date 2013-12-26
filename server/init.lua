@@ -193,7 +193,10 @@ ZED.strFind = function(t, v1, v2)
 		return false
 	end
 end
-	
+ZED.GetLuminance = function(t, col)
+	return (0.2126*col.r)+(0.7152*col.g)+(0.0722*col.b)
+end	
+
 
 ZED.PlayerHasPermission = function(t, ply, str)
 	if not Events:Fire("ZEDPlayerHasPermission", {player=ply, permission=str}) then
@@ -212,10 +215,14 @@ ZED.UpdatePlayerList = function(tbl)
 		t.name = Config:GetValue("Server", "Name")
 		t.maxplayers = Config:GetValue("Server", "MaxPlayers")
 		t.header = {"#","Name", "Kills", "Deaths"}
-		
 		--for i = 0, 144, 1 do
 			for v in Server:GetPlayers() do
-				local p = {v:GetId(),v:GetName(),BGColor=v:GetColor(),FGColor=Color(0,0,0),PData:Get(v).kills,PData:Get(v).deaths}
+				local fgColor = Color(0,0,0)
+				local bgColor = v:GetColor()
+				if ZED:GetLuminance(bgColor) < 130 then
+					fgColor = Color(255,255,255)
+				end
+				local p = {v:GetId(),v:GetName(),BGColor=bgColor,FGColor=fgColor,PData:Get(v).kills,PData:Get(v).deaths}
 				for k,i in pairs(ZED.ScoreBoardCustomField) do
 					if k == "BGColor" or k == "FGColor" then
 						p[k] = i[v:GetId()]

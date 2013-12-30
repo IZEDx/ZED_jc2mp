@@ -24,25 +24,30 @@ function ZED.Init(t)
 	ZED:UpdatePlayerList()
 end
 	
---[[Events:Register( "ZEDPlayerHasPermission" ) -- Deprecated
-Events:Register( "ZEDPlayerInit" )
-Events:Register( "ZEDExecuteCommand" )
-Events:Register( "ZEDSendChatMessage" )
-Events:Register( "ZEDScoreboardUpdate" )
-Events:Register( "ZEDUpdateScoreboard" )
-Events:Register( "ZEDPlayerDeath" )
-Events:Register( "ZEDPlayerJoin" )
-Events:Register( "ZEDPlayerQuit" )
-Events:Register( "ZEDBroadcast" )
-Events:Register( "ZEDReady" )]]
 
-Events:Subscribe("ZEDNotify", function(args)
+ZED.SendChatMessage = function(tbl, ply, ...)
+        Network:Send( ply, "ZEDChat", {...} )
+end
+ZED.Broadcast = function(tbl, ...)
+        Network:Broadcast( "ZEDChat", {...} )
+end
+ZED.Notify = function(tbl, args)
 	if(args.player)then
-		Network:Send(args.player, "ZEDNotify", args)
+		Network:Send(args.player, "Notify", args)
 	else
-		Network:Broadcast("ZEDNotify", args)
+		Network:Broadcast("Notify", args)
 	end
-end)
+end
+ZED.SideNotify = function(tbl, args)
+	if(args.player)then
+		Network:Send(args.player, "SideNotify", args)
+	else
+		Network:Broadcast("SideNotify", args)
+	end
+end
+
+Events:Subscribe("ZEDNotify", ZED.Notify)
+Events:Subscribe("ZEDSideNotify", ZED.SideNotify)
 Events:Subscribe( "ZEDSendChatMessage", function(args)
 	Network:Send( args.player, "ZEDChat", args.message )
 end)
@@ -130,14 +135,14 @@ Events:Subscribe("PlayerChat", function(args)
 end)
 Events:Subscribe("PlayerJoin", function(args)
 	if Events:Fire("ZEDPlayerJoin", {zed=ZED, args=args}) then
-		ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." joined the server.")
+		ZED:SideNotify({color=Color(0,200,200), text=args.player:GetName().." joined the server.", size=20})
 	end
 	ZED:InitPlayer(args.player)
 	ZED:UpdatePlayerList()
 end)
 Events:Subscribe("PlayerQuit", function(args)
 	if Events:Fire("ZEDPlayerQuit", {zed=ZED, args=args}) then
-		ZED:Broadcast(Color(0,200,200,255), args.player:GetName().." left the server.")
+		ZED:SideNotify({color=Color(0,200,200), text=args.player:GetName().." left the server.", size=20})
 	end
 	ZED:UpdatePlayerList()
 	PData:Save(args.player)
@@ -261,13 +266,6 @@ ZED.GetPlayer = function(tbl, str)
 			return player
 		end
 	end
-end
-
-ZED.SendChatMessage = function(tbl, ply, ...)
-        Network:Send( ply, "ZEDChat", {...} )
-end
-ZED.Broadcast = function(tbl, ...)
-        Network:Broadcast( "ZEDChat", {...} )
 end
 
 local initialized = false

@@ -31,14 +31,14 @@ end
 ZED.Broadcast = function(tbl, ...)
         Network:Broadcast( "ZEDChat", {...} )
 end
-ZED.Notify = function(tbl, args)
+Notify = function(args)
 	if(args.player)then
 		Network:Send(args.player, "Notify", args)
 	else
 		Network:Broadcast("Notify", args)
 	end
 end
-ZED.SideNotify = function(tbl, args)
+SideNotify = function(args)
 	if(args.player)then
 		Network:Send(args.player, "SideNotify", args)
 	else
@@ -46,8 +46,8 @@ ZED.SideNotify = function(tbl, args)
 	end
 end
 
-Events:Subscribe("ZEDNotify", ZED.Notify)
-Events:Subscribe("ZEDSideNotify", ZED.SideNotify)
+Events:Subscribe("ZEDNotify", Notify)
+Events:Subscribe("ZEDSideNotify", SideNotify)
 Events:Subscribe( "ZEDSendChatMessage", function(args)
 	Network:Send( args.player, "ZEDChat", args.message )
 end)
@@ -135,14 +135,14 @@ Events:Subscribe("PlayerChat", function(args)
 end)
 Events:Subscribe("PlayerJoin", function(args)
 	if Events:Fire("ZEDPlayerJoin", {zed=ZED, args=args}) then
-		ZED:SideNotify({color=Color(0,200,200), text=args.player:GetName().." joined the server.", size=20})
+		SideNotify({color=Color(0,200,200), text=args.player:GetName().." joined the server.", size=20})
 	end
 	ZED:InitPlayer(args.player)
 	ZED:UpdatePlayerList()
 end)
 Events:Subscribe("PlayerQuit", function(args)
 	if Events:Fire("ZEDPlayerQuit", {zed=ZED, args=args}) then
-		ZED:SideNotify({color=Color(0,200,200), text=args.player:GetName().." left the server.", size=20})
+		SideNotify({color=Color(0,200,200), text=args.player:GetName().." left the server.", size=20})
 	end
 	ZED:UpdatePlayerList()
 	PData:Save(args.player)

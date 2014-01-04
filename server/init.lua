@@ -12,6 +12,26 @@ ZED.ScoreBoardCustomField = {}
 ZED.ScoreBoardExtraField = {}
 ZED.ScoreBoardButtons = {}
 ZED.LastMessages = {}
+ZED.Prefixes = {}
+ZED.TextColors = {}
+ZED.Colors = {
+	Color(0,0,0),
+	Color(0,0,191),
+	Color(0,191,0),
+	Color(0,191,191),
+	Color(191,0,0),
+	Color(191,0,191),
+	Color(191,191,0),
+	Color(191,191,191),
+	Color(64,64,64),
+	Color(64,64,255),
+	Color(64,255,64),
+	Color(64,255,255),
+	Color(255,64,64),
+	Color(255,64,255),
+	Color(255,255,64),
+	Color(255,255,255)
+}
 	
 function ZED.Init(t)
 	
@@ -72,6 +92,22 @@ Events:Subscribe( "ZEDUpdateScoreboard", function(t)
 	end
 	--Network:Broadcast( "ZEDUpdateBoard", t )
 end)
+Events:Subscribe("ZEDSetTextColor", function(args)
+	if args.player then
+		ZED.TextColors[args.player:GetId()] = args.color
+	end
+end)
+Events:Subscribe("ZEDSetPrefix", function(args)
+	if args.player then
+		if ZED.Prefixes[args.player:GetId()] then
+			for k,v in pairs(args.prefix) do
+				table.insert(ZED.Prefixes[args.player:GetId()], v)
+			end
+		else
+			ZED.Prefixes[args.player:GetId()] = args.prefix
+		end
+	end
+end)
 Network:Subscribe("ZEDButtonClick", function(args)
 	local cmd = args
 	Events:Fire("ZEDExecuteCommand", {player=args.player, cmd=cmd})
@@ -109,13 +145,39 @@ Events:Subscribe("PlayerChat", function(args)
 	end
 	if (args.text:sub(1, 1) ~= '/') then
 		Console:Print(args.player:GetName() .. ": " .. args.text)
+		local msg = args.text
+		if string.find(args.text, "&") then
+			msg = {}
+			local correct = false
+			for k,v in pairs(args.text:split('&')) do
+				if tonumber(string.sub(v,1,1),16) then
+					table.insert(msg, ZED.Colors[tonumber(string.sub(v,1,1),16)+1])
+					table.insert(msg, string.sub(v,2))
+					if string.len(string.sub(v,2)) > 0 then
+						correct = true
+					end
+				else
+					if k > 1 then
+						table.insert(msg, "&" .. v)
+					else
+						table.insert(msg,v)
+					end
+				end
+			end
+			if not correct then
+				return false
+			end
+		end
 		if not Events:Fire("ZEDAllowPlayerChat", args) then
 			return false
 		end
-		if not Events:Fire("ZEDPlayerChat", args) then
-			return false
+		ZED.Prefixes[args.player:GetId()] = {}
+		Events:Fire("ZEDRequestPrefix", args.player)
+		Events:Fire("ZEDRequestTextColor", args.player)
+		if not ZED.TextColors[args.player:GetId()] then
+			ZED.TextColors[args.player:GetId()] = Color(0xCC,0xCC,0xCC)
 		end
-		ZED:Broadcast(args.player:GetColor(), args.player:GetName(), Color(150,150,150), ": ", args.text)
+		ZED:Broadcast(ZED.Prefixes[args.player:GetId()], args.player:GetColor(), args.player:GetName(), ZED.TextColors[args.player:GetId()], ": ", msg)
 		return false
 	end
 	local str = string.sub(args.text, 2)
@@ -147,6 +209,7 @@ Events:Subscribe("PlayerQuit", function(args)
 	ZED:UpdatePlayerList()
 	PData:Save(args.player)
 	PData:Delete(args.player)
+	ZED.Prefixes[args.player:GetId()] = nil
 	ZED.LastMessages[args.player:GetId()] = nil
 end)
 Events:Subscribe("PreTick", function()

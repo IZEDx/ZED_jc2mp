@@ -104,6 +104,14 @@ function ZEDChat:ParseMessage(args)
 	for k,v in pairs(args) do
 		if(type(v)=="string")then
 			table.insert(t, {text = v, color = col})
+		elseif(type(v)=="table")then
+			for i,j in pairs(v) do
+				if(type(j)=="string")then
+					table.insert(t, {text = j, color = col})
+				else
+					col = j
+				end
+			end
 		else
 			col = v
 		end

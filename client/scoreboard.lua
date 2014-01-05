@@ -48,19 +48,19 @@ function ZEDBoard:Render( args )
 			modX = Render.Width / 5 * 0.5
 			local x = Render.Width/5 * 0.5
 			local width = Render.Width /5*1
-			Render:FillArea(Vector2(x -40,y), Vector2(Render.Width /5*1 - 10, 100 + (Render.Height - 200)), Color(0,0,0,150))
+			Render:FillArea(Vector2(x -40,y), Vector2(Render.Width /5*1 - 10, 100 + (Render.Height - 200)), background)
 			local y2 = y+20
 			local y = y2
 			for _,ply in pairs(self.Players) do
 				if(ply[1] == self.ViewPlayer)then
 					for k,v in pairs(self.Header) do
-						Render:DrawText( Vector2(x-Render:GetTextWidth(v .. ": ") + width/10,y), tostring(v .. ": "), Color(255,255,255) )
-						Render:DrawText( Vector2(x + width/8,y), tostring(ply[k]), Color(255,255,255) )
+						Render:DrawText( Vector2(x-Render:GetTextWidth(v .. ": ") + width/10,y), tostring(v .. ": "), header )
+						Render:DrawText( Vector2(x + width/8,y), tostring(ply[k]), header )
 						y = y + 20
 					end
 					for k,v in pairs(ply.ExtraInfo) do
-						Render:DrawText( Vector2(x-Render:GetTextWidth(k .. ": ") + width/10,y), tostring(k .. ": "), Color(255,255,255) )
-						Render:DrawText( Vector2(x + width/8,y), tostring(v), Color(255,255,255) )
+						Render:DrawText( Vector2(x-Render:GetTextWidth(k .. ": ") + width/10,y), tostring(k .. ": "), extraInfo )
+						Render:DrawText( Vector2(x + width/8,y), tostring(v), extraInfo )
 						y = y + 20
 					end
 					break
@@ -70,20 +70,20 @@ function ZEDBoard:Render( args )
 				if(lply[1] == LocalPlayer:GetId())then
 					for k,v in pairs(lply.Buttons) do
 						if mpos.x > x -20 and mpos.x < x-20 + Render.Width / 5 -50 and mpos.y >= y and mpos.y <= y + 20 then
-							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(100,100,100,150))
+							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), buttonSelected )
 						else
-							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), Color(200,200,200,150))
+							Render:FillArea(Vector2(x -20,y), Vector2(Render.Width /5*1 - 50, 20), button )
 						end
-						Render:DrawText( Vector2(x-Render:GetTextWidth(k)/2 + width/3,y+3), tostring(k), Color(255,255,255) )
+						Render:DrawText( Vector2(x-Render:GetTextWidth(k)/2 + width/3,y+3), tostring(k), playerNames )
 						y = y + 25
 					end
 					break
 				end
 			end
 		end
-		Render:FillArea(Vector2(Render.Width/5-20 + modX,y), Vector2(Render.Width /5*3+40, 100 + (Render.Height - 200)), Color(0,0,0,150))
-		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth(self.ServerName, 20)/2,y+10), self.ServerName, Color(255,255,255), 20 )
-		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth("Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", 18)/2,y+30), "Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", Color(255,255,255), 18 )
+		Render:FillArea(Vector2(Render.Width/5-20 + modX,y), Vector2(Render.Width /5*3+40, 100 + (Render.Height - 200)), background)
+		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth(self.ServerName, 20)/2,y+10), self.ServerName, serverName, 20 )
+		Render:DrawText( Vector2(Render.Width/2 + modX - Render:GetTextWidth("Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", 18)/2,y+30), "Players: " .. #self.Players .. "/" .. self.MaxPlayers .. " ("..round(100/self.MaxPlayers*#self.Players,2).."%)", playerCount, 18 )
 		
 		y = y + 50
 		local x = Render.Width / 5 + 20 + modX
@@ -133,8 +133,8 @@ function ZEDBoard:Render( args )
 			end
 		end	
 		local credits = "ZED V2.0"
-		Render:FillArea(Vector2(Render.Width/5-20 + modX,Render.Height - 30), Vector2(Render.Width /5*3+40, 30), Color(0,0,0,150))
-		Render:DrawText( Vector2(Render.Width/2-20 + modX,Render.Height - 20), tostring(credits), Color(200,200,200), 15 )
+		Render:FillArea(Vector2(Render.Width/5-20 + modX,Render.Height - 30), Vector2(Render.Width /5*3+40, 30), background)
+		Render:DrawText( Vector2(Render.Width/2-20 + modX,Render.Height - 20), tostring(credits), extraInfo, 15 )
 	end
 end
 

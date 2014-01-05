@@ -134,7 +134,7 @@ function ZEDBoard:Render( args )
 		end	
 		local credits = "ZED V2.0"
 		Render:FillArea(Vector2(Render.Width/5-20 + modX,Render.Height - 30), Vector2(Render.Width /5*3+40, 30), background)
-		Render:DrawText( Vector2(Render.Width/2-20 + modX,Render.Height - 20), tostring(credits), credit, 15 )
+		Render:DrawText( Vector2(Render.Width/2-20 + modX,Render.Height - 20), tostring(credits), extraInfo, 15 )
 	end
 end
 

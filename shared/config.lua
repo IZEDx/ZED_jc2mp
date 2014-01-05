@@ -14,14 +14,12 @@ header = Color(255,255,255)
 
 extraInfo = Color(255,255,255)
 
-playerFill1 = Color(100,100,100,150)
+buttonSelected = Color(100,100,100,150)
 
-playerFill2 = Color(200,200,200,150)
+button = Color(200,200,200,150)
 
 playerNames = Color(255,255,255,255)
 
 serverName = Color(255,255,255)
 
 playerCount = Color(255,255,255)
-
-credits = Color(255,255,255)

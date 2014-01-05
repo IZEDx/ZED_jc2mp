@@ -3,6 +3,7 @@ ZED V2.0a
 
 This is the currently most stable version of ZED.
 It has been completely rewritten and supports an external API.
+To configure the scoreboard colors, go to the config.lua in the shared folder.
 
 Documentation can be found in the Wiki.
 

@@ -171,6 +171,13 @@ function ZEDChat:KeyDown( args )
 			self.ChatEnabled = true
 		end
 	end
+	if(args.key == 191)then
+		if(Chat:GetActive()) then
+			Chat:SetActive(false)
+		else
+			Chat:SetActive(true)
+		end
+	end
 end
 
 local zedchat = ZEDChat()

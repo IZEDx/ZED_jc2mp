@@ -3,7 +3,8 @@ ZED V2.0a
 
 This is the currently most stable version of ZED.
 It has been completely rewritten and supports an external API.
-To configure the scoreboard colors, go to the config.lua in the shared folder.
+To configure the scoreboard colors, go to the config.lua in the shared folder.   
+You can also open the chat entry box with "/" as well as with t, and it will enter "/" for you in the chat when you use "/", so commands are easier now.   
 
 Documentation can be found in the Wiki.
 
